@@ -17,7 +17,19 @@ The screen has four parts:
 - **The side panel**, on the left, with three tabs: **History**, **Old maps** and **Journeys**. Press **Esc** to hide or show it.
 - **The timeline**, along the bottom: the main line, the zoom ruler, and the controls.
 
-## 2. Travel through time
+## 2. Search for anything
+
+The search box at the top of the panel (press **/** or **⌘K** from anywhere) finds:
+
+- **A moment**: type `1453`, `323 BC` or `20 July 1969` and pick *Go to*.
+- **Things in Palimpsest**: landmarks, thinkers, journeys, old maps, and the events of the year on screen.
+- **Anything on Wikipedia**: people, places, battles, buildings, inventions. Pick one and Palimpsest reads its date and place from Wikidata, moves the timeline there (for a person, the middle of their life), flies to the spot (for a person, their birthplace) and opens a card with a summary and picture.
+
+Use **↑ ↓** and **Return** to choose, **Esc** to clear.
+
+> **Try it:** search `Battle of Hastings`, then `Marie Curie`, then `Great Wall of China`.
+
+## 3. Travel through time
 
 **Drag the timeline.** It runs from the Big Bang on the left to today on the right. It isn't to scale: recent centuries get more room, so you can still pick out individual years. The colours are the official geologic time scale, and the labelled bands mark *Universe*, *Early Earth*, *Life*, *Humans* and *History*.
 
@@ -41,7 +53,7 @@ The screen has four parts:
 
 > **Try it:** type `1914`, then press **Space** and watch the borders of Europe change through the First World War.
 
-## 3. Read what happened
+## 4. Read what happened
 
 The **History** tab shows what happened in the year on screen, from Wikipedia.
 
@@ -54,7 +66,7 @@ Before written history there are no year-by-year lists, so the panel shows a sum
 
 > **Try it:** type `1969`, click the square for 20 July, then click the top event.
 
-## 4. Explore the map
+## 5. Explore the map
 
 - **Click any region** to see its name in that era, who ruled it, and a Wikipedia summary. Borders come from a historical atlas and get rougher the further back you go.
 - **Old maps** appear when the timeline reaches their years: London in the 1890s, Cassini's France, Switzerland edition by edition, post-war Tokyo from the air. Gold dots mark them when you're zoomed out. The **Old maps** tab lists them all, and **Side-by-side compare** (at the bottom of the panel) opens a viewer with fade, swipe and spyglass modes.
@@ -67,7 +79,7 @@ Before written history there are no year-by-year lists, so the panel shows a sum
 
 > **Try it:** type `250 million years ago` to see Pangaea, then `66 m` and click the red pin in the Gulf of Mexico.
 
-## 5. Thinkers and art
+## 6. Thinkers and art
 
 The switches at the top of the panel turn layers on and off: **Events**, **Thinkers** and **Art**.
 
@@ -78,7 +90,7 @@ The switches at the top of the panel turn layers on and off: **Events**, **Think
 
 > **Try it:** type `1505` and zoom into Italy.
 
-## 6. Take a guided journey
+## 7. Take a guided journey
 
 Open the **Journeys** tab and pick one. Palimpsest flies you from stop to stop with a caption at each; use **Next** and **Back**, or **End journey**. There are seventeen, including:
 
@@ -90,18 +102,22 @@ Open the **Journeys** tab and pick one. Palimpsest flies you from stop to stop w
 - **Life conquers the land** and **The great extinctions**
 - **Wonders of the ancient world** and **Ice Age humans**
 
-## 7. Ask the guide
+## 8. Ask the guide
 
-**✦ Ask about this moment** (on the timeline) and **✦ Ask the guide** (on any card) open a chat with Claude, Anthropic's AI. The guide knows the moment, where the globe is pointed and what's on screen, and answers like a museum guide. It can also move the globe and switch layers to show you what it's describing.
+**✦ Ask about this moment** (on the timeline) and **✦ Ask the guide** (on any card) open a chat with an AI guide. The guide knows the moment, where the globe is pointed and what's on screen, and answers like a museum guide. It can also move the globe and switch layers to show you what it's describing.
 
 ![The guide panel](docs/screenshot-guide.jpg)
 
-**Setting it up (once):**
+**Choosing an AI (once):** open the guide and press **Settings**. Pick one of four providers:
 
-1. Create an API key in the [Anthropic Console](https://console.anthropic.com/settings/keys). Usage is billed to your Anthropic account.
-2. Open the guide, paste the key into the box, and press **Save key**.
+| Provider | Needs | Cost |
+| --- | --- | --- |
+| **Claude** (Anthropic) | an API key from the [Anthropic Console](https://console.anthropic.com/settings/keys) | billed to your Anthropic account |
+| **ChatGPT** (OpenAI) | an API key from the [OpenAI dashboard](https://platform.openai.com/api-keys); then pick a model | billed to your OpenAI account |
+| **Free models · OpenRouter** | a free [OpenRouter](https://openrouter.ai/keys) account and key; then pick one of the free models | free, with daily limits |
+| **Free, no key · Pollinations** | nothing | free and anonymous, but slower and less reliable, and your questions go to Pollinations.ai |
 
-The key is saved only in your browser (or in the Mac app) and is sent only to Anthropic. To remove it, open the guide and press **Key → Remove saved key**.
+Paste the key and press **Save key**. Keys are saved only in your browser (or the Mac app) and sent only to that provider; **Remove saved key** deletes one. Switching provider starts a fresh conversation. All four can move the globe for you, except a few free models that don't support tools: those still answer, but can't take you places.
 
 **Things to ask:**
 
@@ -114,7 +130,7 @@ The key is saved only in your browser (or in the Mac app) and is sent only to An
 
 **New** starts a fresh conversation. The guide can be wrong, so check anything important.
 
-## 8. The Mac app
+## 9. The Mac app
 
 The repository includes a native Mac app. To build and install it:
 
@@ -134,10 +150,12 @@ It opens Palimpsest in its own window, with menus for **Time Machine** (⌘1), *
 | `T` | Tilt to 3D |
 | `Esc` | Show or hide the panel |
 | Click the year | Type a year or a date |
+| `/` or `⌘K` | Search |
 
 ## If something looks wrong
 
 - **The globe is blank or slow.** Palimpsest loads everything live: imagery, borders, history and art. On a slow connection, give it a few seconds, especially the first time you visit an era.
 - **Deep time fills in slowly.** Each ancient-continent snapshot takes about five seconds to build the first time.
 - **No events for a year.** Some years have little on Wikipedia, especially outside Europe and before about AD 1000. Try the decade around it.
+- **A journey stopped.** Journeys now resume from the same stop after a reload, so if the page refreshes (for example the Mac app picking up an update), you carry on where you were.
 - **The guide says the key was rejected.** Check you copied the whole key (it starts with `sk-ant-`), and that your Anthropic account has credit.

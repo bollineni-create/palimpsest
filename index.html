@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.css">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/app.css?v=202610182008">
 <script>try { const t = localStorage.getItem("palimpsest:theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 
 </head>
@@ -30,6 +30,11 @@
   <header>
     <div class="brand"><h1>Palim<i>psest</i></h1><div class="brand-tools"><button type="button" class="theme-btn" id="themeBtn" title="Appearance"></button><button class="x" id="closeDrawer" aria-label="Hide panel" title="Hide (Esc)">×</button></div></div>
     <span class="tag">Field notes along the line of time</span>
+    <div class="search" role="search">
+      <input id="searchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search a year, person, place or event" aria-label="Search" aria-controls="searchResults">
+      <kbd>/</kbd>
+      <div class="search-results" id="searchResults" role="listbox" hidden></div>
+    </div>
   </header>
   <div class="layer-chips" id="layerChips" aria-label="Layers"></div>
   <div class="tabs" role="tablist">
@@ -65,17 +70,29 @@
     <div class="g-title"><span class="spark">✦</span><div><h2>Guide</h2><span class="tag" id="guideMoment"></span></div></div>
     <div class="g-tools">
       <button type="button" class="g-icon" id="guideNew" title="New conversation">New</button>
-      <button type="button" class="g-icon" id="guideSettings" title="API key">Key</button>
+      <button type="button" class="g-icon" id="guideSettings" title="AI provider, key and model">Settings</button>
       <button type="button" class="x" id="closeGuide" aria-label="Close guide">×</button>
     </div>
   </header>
   <div class="g-key" id="guideKey" hidden>
-    <p>To talk with the guide, add your own <strong>Anthropic API key</strong>. It's stored only in this browser (or this Mac app) and is sent only to Anthropic. Questions are billed to your Anthropic account.</p>
+    <label class="g-field"><span class="g-label">AI provider</span>
+      <select id="guideProvider" aria-label="AI provider">
+        <option value="anthropic">Claude (Anthropic key)</option>
+        <option value="openai">ChatGPT (OpenAI key)</option>
+        <option value="openrouter">Free models · OpenRouter (free key)</option>
+        <option value="pollinations">Free, no key · Pollinations</option>
+      </select>
+    </label>
+    <p class="g-note" id="guideProviderNote"></p>
     <form id="guideKeyForm">
-      <input id="guideKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Anthropic API key">
-      <button type="submit" class="pill">Save key</button>
+      <span class="g-label" id="guideKeyLabel">API key</span>
+      <div class="g-keyrow">
+        <input id="guideKeyInput" type="password" autocomplete="off" spellcheck="false" aria-label="API key">
+        <button type="submit" class="pill">Save key</button>
+      </div>
     </form>
-    <p class="g-small"><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get a key from the Anthropic Console ↗</a> · <button type="button" class="link" id="guideKeyRemove">Remove saved key</button></p>
+    <label class="g-field" id="guideModelRow" hidden><span class="g-label">Model</span><select id="guideModel" aria-label="Model"></select></label>
+    <p class="g-small" id="guideKeyLinks">Keys are stored only on this device and sent only to that provider. <a id="guideKeyLink" href="#" target="_blank" rel="noopener">Get a key</a> · <button type="button" class="link" id="guideKeyRemove">Remove saved key</button></p>
     <p class="g-small bad" id="guideKeyMsg" aria-live="polite"></p>
   </div>
   <div class="g-log" id="guideLog" aria-live="polite"></div>
@@ -85,7 +102,7 @@
     <button type="submit" class="g-send" id="guideSend" aria-label="Send">↑</button>
     <button type="button" class="g-send stop" id="guideStop" aria-label="Stop" hidden>■</button>
   </form>
-  <p class="g-small g-model">Claude Opus 5.5 · answers can be wrong, so check what matters</p>
+  <p class="g-small g-model" id="guideModelLabel">Claude Opus 5.5 · answers can be wrong, so check what matters</p>
 </aside>
 
 <div class="tutorial" id="tutorial" hidden>
@@ -156,15 +173,16 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.js"></script>
-<script src="js/core.js"></script>
-<script src="js/data/milestones.js"></script>
-<script src="js/data/maps.js"></script>
-<script src="js/data/tours.js"></script>
-<script src="js/data/thinkers.js"></script>
-<script src="js/app.js"></script>
-<script src="js/layers.js"></script>
-<script src="js/finetune.js"></script>
-<script src="js/guide.js"></script>
-<script src="js/tutorial.js"></script>
+<script src="js/core.js?v=202610182008"></script>
+<script src="js/data/milestones.js?v=202610182008"></script>
+<script src="js/data/maps.js?v=202610182008"></script>
+<script src="js/data/tours.js?v=202610182008"></script>
+<script src="js/data/thinkers.js?v=202610182008"></script>
+<script src="js/app.js?v=202610182008"></script>
+<script src="js/layers.js?v=202610182008"></script>
+<script src="js/finetune.js?v=202610182008"></script>
+<script src="js/guide.js?v=202610182008"></script>
+<script src="js/search.js?v=202610182008"></script>
+<script src="js/tutorial.js?v=202610182008"></script>
 </body>
 </html>

@@ -16,3 +16,5 @@
 - Event quality: `tools/evaluate-events.js` runs the app's own Wikipedia parser (`parseYearArticle`) over ~67 sample year,
   century and millennium articles and flags non-events (footnotes, citations, statistics rows, fragments, disambiguation leaks).
   Load it in the open app's console and run `await evaluateEvents()`; keep `defects` at 0 after any parser change.
+- Before committing page changes, run `./tools/stamp-version.sh` so browsers and GitHub Pages pick up the new JS/CSS (it stamps `?v=` on links).
+- The guide supports several providers (`PROVIDERS` in `js/guide.js`); keys live in localStorage per provider. Pollinations needs no key, so it can be tested end to end.

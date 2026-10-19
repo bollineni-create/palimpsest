@@ -12,12 +12,13 @@ Drag the timeline and the world changes with it: historical borders, old maps la
 ## What it does
 
 - **A timeline of everything.** One line runs from the Big Bang 13.8 billion years ago to today, painted in the official geologic time-scale colours, with about 90 landmark moments as stations along it. Press play and watch history run.
+- **Search for anything.** A year, a date, a person, a place or an event: Palimpsest finds its moment and location on Wikipedia and Wikidata and takes you there.
 - **Fine-tune the moment.** Click the year and type any moment: "1453", "323 BC", "66 million years ago" or "20 July 1969". A zoom ruler under the timeline scrubs a chosen span, from 10 years to a billion.
 - **Explore like a globe.** Spin, zoom and tilt into 3D terrain. Satellite imagery is softened like a watercolour, and fades towards sepia the further back you go.
 - **Borders for every era.** Empires and countries redraw themselves for the year you're on, back to 123,000 BC. Click any region for who ruled it and a Wikipedia summary.
 - **What happened, day by day.** Every year from AD 1000 on gets a calendar heat-map. Pick a day to see its events ranked by impact, pinned on the globe. Earlier eras show the year, century or millennium.
 - **Thinkers and art.** Switch on layers for the philosophers alive at the time (about 95, from Confucius and the Buddha to Arendt and Fanon) and for public-domain artworks from the period, shown where they were made.
-- **Ask the guide.** "Ask about this moment" opens a chat with Claude that knows the year, the place and what's on screen. It answers like a museum guide and can move the globe to show you what it's describing. It uses your own Anthropic API key, which stays in your browser.
+- **Ask the guide.** "Ask about this moment" opens a chat with Claude that knows the year, the place and what's on screen. It answers like a museum guide and can move the globe to show you what it's describing. Use Claude or ChatGPT with your own API key, or free models through OpenRouter or Pollinations (no key at all). Keys stay in your browser.
 - **Old maps in their own time.** Ordnance Survey London in the 1890s, the Cassini map of France, Swiss maps edition by edition, post-war Tokyo from the air and more fade in on the globe when the timeline reaches their years.
 - **Deep time.** Before people, the globe shows the continents where they actually sat, back a billion years. Before that it's an ocean world, then a molten young Earth, then nothing at all.
 - **Seventeen guided journeys.** From the Big Bang to you, the Axial Age, the Silk Road, the age of exploration, Renaissance art, the Second World War, the space race, the great extinctions, Ice Age humans and more.
@@ -53,6 +54,7 @@ Then open <http://localhost:8000>. GitHub Pages works too: publish the repositor
 | `T` | Tilt to 3D |
 | `Esc` | Show or hide the panel |
 | Click the year | Type a year or a date |
+| `/` or `⌘K` | Search |
 
 ## The Mac app
 
@@ -79,13 +81,15 @@ js/data/thinkers.js   philosophers from every tradition, with where and when the
 js/app.js             globe, timeline, deep time, history and impact ranking
 js/layers.js          the thinker and art layers
 js/finetune.js        typing a moment, and the zoom ruler
-js/guide.js           the AI guide (Claude, via the official Anthropic SDK)
+js/guide.js           the AI guide (Claude via the official Anthropic SDK; ChatGPT, OpenRouter and Pollinations via their chat APIs)
+js/search.js          search: moments, things in Palimpsest, and anything on Wikipedia
+js/tutorial.js        the first-run guided tour
 app/macos/            the native Mac wrapper (Swift, no Xcode project needed)
 ```
 
 Plain scripts, no framework and no bundler. [MapLibre GL JS](https://maplibre.org) draws the globe, and [Leaflet](https://leafletjs.com) draws the compare view.
 
-**The guide.** It runs entirely in the browser: the page loads the official [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) and talks to Claude Opus 5.5 directly, with your own API key saved in `localStorage`. There's no server in between. Each question carries a short description of where you are (the moment, the map view and what's on screen), and Claude has two tools: `go_to_moment`, which moves the timeline and globe, and `set_layers`. Server-side refusal fallback is switched on, so if a safeguard declines a request, the API retries it on a suitable fallback model. Questions are billed to your Anthropic account.
+**The guide.** It runs entirely in the browser, with no server in between. With Claude, the page loads the official [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) and talks to Claude Opus 5.5 directly, with your own API key saved in `localStorage`. ChatGPT, OpenRouter's free models and Pollinations are called through their OpenAI-compatible chat APIs, streamed the same way. There's no server in between. Each question carries a short description of where you are (the moment, the map view and what's on screen), and Claude has two tools: `go_to_moment`, which moves the timeline and globe, and `set_layers`. Server-side refusal fallback is switched on, so if a safeguard declines a request, the API retries it on a suitable fallback model. Questions are billed to your Anthropic account.
 
 **How "impact" is ranked.** Wikipedia's year articles list events without any ranking. Palimpsest scores each event by its subject: how long and how widely translated that Wikipedia article is, read from Wikidata. Wikipedia's one-line description adds a boost for specific events from that very year ("First crewed Moon landing (1969)"). People, countries and broad topics, which are linked from everything, are damped, and each subject leads the top list only once. It's a heuristic, and it gets some years wrong.
 
@@ -100,7 +104,7 @@ Everything is loaded live from its source and shown with attribution on the map.
 - **Terrain:** [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) on AWS Open Data, originally from Mapzen.
 - **Old maps:** [National Library of Scotland](https://maps.nls.uk), [swisstopo](https://www.swisstopo.admin.ch), [IGN France](https://www.geoportail.gouv.fr), [IGN España](https://www.ign.es), [GSI Japan](https://maps.gsi.go.jp), and maps from Digital Commonwealth, the Nationaal Archief, Yale Library and MSU Libraries, warped by [Allmaps](https://allmaps.org).
 - **Art:** the [Cleveland Museum of Art Open Access](https://www.clevelandart.org/open-access) collection (CC0).
-- **AI guide:** [Claude](https://www.anthropic.com/claude) by Anthropic, using your own API key.
+- **AI guide:** [Claude](https://www.anthropic.com/claude) by Anthropic or ChatGPT by OpenAI (your own API key), or free models via [OpenRouter](https://openrouter.ai) and [Pollinations](https://pollinations.ai).
 - **Fonts:** Inter Tight, Cormorant Garamond and IBM Plex Mono from Google Fonts (SIL Open Font License).
 - **Libraries:** MapLibre GL JS (BSD-3-Clause), Leaflet (BSD-2-Clause) and the Anthropic TypeScript SDK (MIT).
 

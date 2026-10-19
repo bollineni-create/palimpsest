@@ -4,6 +4,7 @@
 const TUTORIAL_KEY = "palimpsest:tutorial-done";
 const TUTORIAL = [
   { title: "Welcome to Palimpsest", text: "A journey through 13.8 billion years on a 3D globe: borders, old maps, thinkers, art and what happened each day. This tour takes about a minute.", start: true },
+  { target: ".search", title: "Search anything", text: "Type a year or date, a person, a place or an event. Palimpsest finds its moment and location, takes you there and shows what it was. Press / to search at any time." },
   { target: ".track", title: "The timeline", text: "Drag along this line to travel through time: the Big Bang on the left, today on the right. It's coloured by the geologic time scale, and each dot is a landmark moment. Hover over a dot to see what it is, or click to jump there." },
   { target: "#yr", title: "Type any moment", text: "Click the year to type an exact moment: 1453, 323 BC, 66 million years ago, or a date like 20 July 1969." },
   { target: ".fine-row", title: "Fine-tune", text: "This ruler zooms in around the current moment. Use − and + to choose a span from 10 years to a billion, then drag to scrub precisely." },

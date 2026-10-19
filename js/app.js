@@ -445,6 +445,8 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
 function startTour(i) { stopPlay(); state.tour = TOURS[i]; state.tourStep = 0; $("caption").hidden = false; showStep(); }
 function showStep() {
   const t = state.tour, s = t.steps[state.tourStep];
+  // Remember the journey, so a reload (or the Mac app refreshing after an update) carries on from this stop
+  try { localStorage.setItem("palimpsest:tour", JSON.stringify({ i: TOURS.indexOf(t), step: state.tourStep })); } catch {}
   $("capTitle").textContent = t.title;
   $("capText").textContent = s.text;
   $("capCount").textContent = `${state.tourStep + 1} of ${t.steps.length}`;
@@ -458,7 +460,12 @@ function showStep() {
 $("capNext").addEventListener("click", () => { if (state.tourStep < state.tour.steps.length - 1) { state.tourStep++; showStep(); } else endTour(); });
 $("capPrev").addEventListener("click", () => { if (state.tourStep > 0) { state.tourStep--; showStep(); } });
 $("capStop").addEventListener("click", endTour);
-function endTour() { state.tour = null; $("caption").hidden = true; }
+function endTour() { state.tour = null; $("caption").hidden = true; try { localStorage.removeItem("palimpsest:tour"); } catch {} }
+function resumeTour() {
+  let saved = null; try { saved = JSON.parse(localStorage.getItem("palimpsest:tour")); } catch {}
+  if (!saved || !TOURS[saved.i] || !TOURS[saved.i].steps[saved.step]) return;
+  state.tour = TOURS[saved.i]; state.tourStep = saved.step; $("caption").hidden = false; showStep();
+}
 
 /* ---------- Timeline ---------- */
 // Hide any tick label that would touch its neighbour (the ends always win); shorten band names to fit.
@@ -1134,7 +1141,7 @@ if (restored && typeof restored.year === "number") {
   map.jumpTo({ center: restored.center, zoom: restored.zoom, pitch: restored.pitch, bearing: restored.bearing });
   setYear(restored.year, { exact: true });
 } else setYear(1900);
-map.on("load", () => { state.ready = true; setYear(state.year, { exact: true }); });
+map.on("load", () => { state.ready = true; setYear(state.year, { exact: true }); resumeTour(); });
 function placeOverlays() {
   const h = document.querySelector(".timeline").offsetHeight + 28;
   $("caption").style.bottom = h + "px";
