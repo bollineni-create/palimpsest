@@ -13,3 +13,6 @@
   Colour and type tokens are at the top of `css/app.css`; map colours are in `THEME` in `js/app.js`.
 - Everything is fetched live (Wikipedia/Wikidata, GPlates, historical-basemaps, tile services). Keep attribution on the map
   and in the README's credits when adding sources.
+- Event quality: `tools/evaluate-events.js` runs the app's own Wikipedia parser (`parseYearArticle`) over ~67 sample year,
+  century and millennium articles and flags non-events (footnotes, citations, statistics rows, fragments, disambiguation leaks).
+  Load it in the open app's console and run `await evaluateEvents()`; keep `defects` at 0 after any parser change.

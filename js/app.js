@@ -584,7 +584,7 @@ const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 // Which article describes this moment best: the year itself, else its century or millennium.
 function historyTitles(y) {
   if (y >= TODAY || y < -10000) return [];
-  if (y >= 1000) return [String(y)];
+  if (y >= 1000) return [String(y), `AD ${y}`];
   if (y >= 1) return [`AD ${y}`, `${ordinal(Math.ceil(y / 100))} century`];
   if (y >= -999) return [`${-y} BC`, `${ordinal(Math.ceil(-y / 100))} century BC`];
   if (y >= -3000) return [`${ordinal(Math.ceil(-y / 100))} century BC`, `${ordinal(Math.ceil(-y / 1000))} millennium BC`];
@@ -619,11 +619,26 @@ function loadHistory(title) {
   return histCache.get(title);
 }
 async function fetchHistory(title) {
-  const sec = await wikiApi({ action: "parse", page: title, prop: "sections", redirects: 1 });
+  const parsed = await parseYearArticle(title);
+  if (!parsed) return null;
+  await enrichEvents(parsed.items, parsed.year);
+  return { title: parsed.title, events: parsed.items };
+}
+// Lines that are page furniture, not events: footnotes, citations, statistics rows, bare numbers
+const NOT_AN_EVENT = [
+  /^[\^↑]/,                                                        // footnote backlinks
+  /Archived from the original|Retrieved \d|\bISBN\b|\bdoi:|\bp{1,2}\.\s?\d+\.?$/,     // citations
+  /^[\p{L} .'’()-]{2,40}:\s*[\d.,\s%~≈-]+$/u,                       // "Africa: 106,000,000"
+  /^\(?[\d.,\s–-]+\)?\.?$/,                                          // a bare number or range
+];
+// Read a Wikipedia year, century or millennium article into a list of events (no network beyond the article itself)
+async function parseYearArticle(title) {
+  const sec = await wikiApi({ action: "parse", page: title, prop: "sections|properties", redirects: 1 });
   if (sec.error) return null;
+  if (sec.parse.properties && "disambiguation" in sec.parse.properties) return null;   // a page about the number, not the year
   const ev = sec.parse.sections.find(x => /^events/i.test(x.line));
   // Most year articles keep events under an "Events" heading; some (like 1453) list them by region straight away, up to "Births"
-  const END = /^(births|deaths|references|see also|notes|further reading|external links)/i;
+  const END = /^(births|deaths|references|see also|notes|sources|citations|footnotes|bibliography|works cited|further reading|external links)/i;
   const wholePage = !ev;
   if (wholePage && (!sec.parse.sections.length || END.test(sec.parse.sections[0].line))) return null;
   const res = await wikiApi(wholePage
@@ -631,9 +646,10 @@ async function fetchHistory(title) {
     : { action: "parse", page: title, section: ev.index, prop: "text", redirects: 1, disableeditsection: 1, disablelimitreport: 1 });
   if (res.error) return null;
   const doc = new DOMParser().parseFromString(res.parse.text, "text/html");
-  doc.querySelectorAll("sup, .mw-ref, style, .reflist, .gallery, table, .thumb, figure, .hatnote, .shortdescription").forEach(n => n.remove());
+  doc.querySelectorAll("sup, .mw-ref, style, .reflist, .refbegin, .mw-references-wrap, ol.references, .references, cite, .citation, .gallery, table, .thumb, figure, .hatnote, .shortdescription, .navbox, .metadata, .noprint, .sistersitebox, .side-box, .portalbox, .sidebar, .infobox, .mw-empty-elt").forEach(n => n.remove());
   const items = [];
   let group = "", started = !wholePage, stopped = false;
+  const merged = new Set(), seenText = new Set();
   // Prose-style articles (like 1453) tell their events in paragraphs rather than bullets, so read those too
   doc.querySelectorAll(wholePage ? "h2, h3, h4, h5, li, p" : "h2, h3, h4, h5, li").forEach(el => {
     if (stopped) return;
@@ -644,9 +660,24 @@ async function fetchHistory(title) {
       return;
     }
     if (!started) return;
-    if (el.querySelector("ul, ol")) return;                   // a parent bullet: its text becomes the date of its children
-    let text = el.textContent.replace(/\s+/g, " ").trim();
-    if (text.length < 12) return;
+    if (merged.has(el)) return;
+    if (el.querySelector("ul, ol")) {
+      // A bullet that introduces a list ("The satrapies are divided:") is one event with its clauses, not several fragments
+      const own = el.cloneNode(true); own.querySelectorAll("ul, ol").forEach(n => n.remove());
+      const intro = own.textContent.replace(/\s+/g, " ").trim();
+      const kids = [...el.querySelectorAll(":scope > ul > li, :scope > ol > li")];
+      if (intro.length > 40 && /[:;,]\s*$/.test(intro) && kids.length && kids.every(k => !k.querySelector("ul, ol") && k.textContent.trim().length < 120)) {
+        kids.forEach(k => merged.add(k));
+        pushItem(el, `${intro.replace(/[;,]\s*$/, ":")} ${kids.map(k => k.textContent.replace(/\s+/g, " ").trim().replace(/[;,.]$/, "")).join("; ")}.`);
+      }
+      return;                                                   // otherwise a parent bullet: its text becomes the date of its children
+    }
+    pushItem(el);
+  });
+  function pushItem(el, override) {
+    let text = (override || el.textContent.replace(/\s+/g, " ").trim()).replace(/\s*[,;:]\s*$/, ".");
+    if (text.length < 12 || NOT_AN_EVENT.some(rx => rx.test(text)) || seenText.has(text)) return;
+    seenText.add(text);
     let date = "";
     const parentLi = el.parentElement && el.parentElement.closest("li");
     if (parentLi) { const c = parentLi.cloneNode(true); c.querySelectorAll("ul, ol").forEach(n => n.remove()); date = c.textContent.replace(/\s+/g, " ").replace(/[\s–—:-]+$/, "").trim(); }
@@ -659,11 +690,10 @@ async function fetchHistory(title) {
     // In prose paragraphs the date sits inside the sentence ("On June 14, …")
     const when = date || (el.tagName === "P" ? (text.match(new RegExp(`\\b(?:${MONTH}) \\d{1,2}\\b|\\b\\d{1,2} (?:${MONTH})\\b`)) || [""])[0] : "");
     items.push({ group, date: date || when, text, links: [...new Set(links)].slice(0, 5), ...parseDay(when, group) });
-  });
+  }
   const events = items.slice(0, 600);
-  const yr = /^\d{1,4}$/.test(res.parse.title) ? +res.parse.title : (res.parse.title.match(/^AD (\d+)$/) || [])[1] ? +res.parse.title.slice(3) : (res.parse.title.match(/^(\d+) BC$/) || [])[1] ? -res.parse.title.match(/^(\d+) BC$/)[1] : null;
-  await enrichEvents(events, yr);
-  return { title: res.parse.title, events };
+  const year = /^\d{1,4}$/.test(res.parse.title) ? +res.parse.title : (res.parse.title.match(/^AD (\d+)$/) || [])[1] ? +res.parse.title.slice(3) : (res.parse.title.match(/^(\d+) BC$/) || [])[1] ? -res.parse.title.match(/^(\d+) BC$/)[1] : null;
+  return { title: res.parse.title, items: events, year };
 }
 
 // Pin each event at its first linked place, and score it by how widely known its subjects are
@@ -914,14 +944,16 @@ function openEvent(data, i) {
   // Explain it with the event's own subject (its most important linked article), not just the place it's pinned to
   const topic = e.subject || e.page || e.links[0];
   $("pYear").textContent = when;
-  $("pName").textContent = topic || "Event";
+  // Without a linked subject, title the card with the event's own opening words rather than a placeholder
+  const headline = e.text.split(/(?<=\w)[.;:](?=\s|$)/)[0].replace(/^(?:On|In|At|By) [^,]{1,30}, /, "").slice(0, 80);
+  $("pName").textContent = topic || headline;
   $("pSub").innerHTML = "";
   const t = document.createElement("span"); t.className = "event-text"; t.textContent = e.text; $("pSub").appendChild(t);
   const where = document.createElement("span"); where.className = "where";
   where.textContent = e.at ? `📍 ${e.page || "On the map"}` : "No location on the map for this event";
   $("pSub").appendChild(where);
   $("place").hidden = false;
-  state.selected = { kind: "event", name: topic || "Event", text: `${when}: ${e.text}${e.page ? ` (located at ${e.page})` : ""}` };
+  state.selected = { kind: "event", name: topic || headline, text: `${when}: ${e.text}${e.page ? ` (located at ${e.page})` : ""}` };
   if (topic) fillSummary(topic, false, [...new Set([topic, ...e.links])]);
   else { $("pImg").hidden = true; $("pExtract").hidden = true; $("pLink").href = wikiUrl(data.title); }
 }
