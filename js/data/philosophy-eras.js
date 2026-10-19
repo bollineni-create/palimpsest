@@ -72,3 +72,92 @@ const PHILOSOPHY_ERAS = [
     questions: ["What would a just society look like?", "How are knowledge and power connected?", "What do we owe future generations and other species?"],
     topics: ["A Theory of Justice", "The Origins of Totalitarianism", "The Wretched of the Earth", "Feminist philosophy", "African philosophy", "Environmental ethics"] },
 ];
+
+// The fuller picture of each era. shaped: what influenced it; ideas: its breakthroughs; world: what else was happening; legacy: what it led to.
+const PHILOSOPHY_DEPTH = {
+  "first-questions": {
+    shaped: ["Trade cities on the Ionian coast, in touch with Egypt, Babylon and Persia", "Babylonian astronomy and Egyptian geometry", "The Vedic hymns and ritual of early India", "Writing spreading beyond temple and palace scribes"],
+    ideas: ["Nature can be explained by natural causes, not the moods of gods", "A single underlying substance, or arche, behind all things", "Atman is Brahman: the inner self is one with ultimate reality", "Heraclitus's flux and Parmenides's unchanging Being, the first great metaphysical debate"],
+    world: "Greek colonies spread around the Mediterranean, the Persian Empire rose under Cyrus the Great, and iron tools and coinage transformed farming and trade from Lydia to the Ganges plain.",
+    legacy: "The habit of asking for reasons, and the debate between change and permanence, set the agenda for Socrates, Plato and every school of metaphysics that followed." },
+  "axial": {
+    shaped: ["Centuries of war between rival Chinese states", "The growth of cities and kingdoms on the Ganges", "Old priestly ritual that many found empty", "Wandering teachers who advised kings for a living"],
+    ideas: ["Ren and li: humaneness and ritual propriety as the basis of order", "The Dao: an effortless way of nature that rewards non-action", "The Four Noble Truths and the Middle Way", "Ahimsa: non-violence towards every living being", "Mozi's impartial care, and Legalism's rule by strict law"],
+    world: "China's Warring States fought until Qin unified the country in 221 BC; in India, the Magadha kingdom grew into the Maurya Empire, whose emperor Ashoka later spread Buddhism across Asia.",
+    legacy: "Confucianism shaped Chinese government for two thousand years, and Buddhism, Jainism and Taoism remain living traditions followed by hundreds of millions." },
+  "classical-greece": {
+    shaped: ["Athenian democracy, where citizens argued in public", "Victory over Persia and the wealth of an Athenian empire", "The Sophists, who taught persuasion for a fee", "Pre-Socratic theories of nature"],
+    ideas: ["The Socratic method: questioning to expose what we really know", "Plato's theory of Forms and his ideal republic", "Aristotle's logic, the syllogism, used for two thousand years", "Virtue ethics: living well means flourishing, or eudaimonia"],
+    world: "The Parthenon was built, Athens and Sparta fought the Peloponnesian War, tragedy and history writing flourished, and Alexander the Great, Aristotle's pupil, conquered as far as India.",
+    legacy: "Plato's Academy and Aristotle's Lyceum set the model for the university, and their questions about knowledge, justice and the soul still shape philosophy curricula." },
+  "hellenistic": {
+    shaped: ["Alexander's empire, which mixed Greek, Egyptian and Persian cultures", "The loss of the small city-state where citizens had a say", "Socrates's example of calm in the face of death", "Roman power and the need for a practical ethics"],
+    ideas: ["Stoicism: distinguish what is in your control and accept the rest", "Epicurus's atoms and his argument that death is nothing to us", "Sceptical suspension of judgement to reach tranquillity", "Natural law and the idea of a citizen of the world"],
+    world: "The Library of Alexandria gathered the world's books, Euclid and Archimedes advanced mathematics, and Rome grew from a republic into an empire stretching from Britain to Syria.",
+    legacy: "Stoic ideas of natural law and universal humanity fed into Roman law, Christian ethics, human rights and, today, cognitive behavioural therapy." },
+  "indian-schools": {
+    shaped: ["The Upanishads and the Buddha's teaching", "Royal patronage under the Mauryas, Kushans and Guptas", "Great monastic universities that hosted public debates", "Long traditions of grammar and oral memorisation"],
+    ideas: ["Shunyata: all things are empty of fixed, independent existence", "Non-dualism: the self and ultimate reality are one", "Nyaya's rules for valid knowledge and inference", "Yoga and Samkhya's split between consciousness and matter"],
+    world: "The Gupta age produced the decimal place-value system and zero, Sanskrit drama and science; Buddhism travelled the Silk Road to China, Korea and Japan.",
+    legacy: "Indian logic and Buddhist philosophy shaped thought across Asia, and Vedanta became the backbone of modern Hindu philosophy." },
+  "late-antiquity": {
+    shaped: ["Plato's philosophy, revived and made mystical", "The rise of Christianity, made the Roman state religion in 380", "Crisis and the fall of the western Roman Empire", "Jewish and Christian scripture read with Greek tools"],
+    ideas: ["The One: all reality flows out from a single source", "Evil as the absence of good rather than a force", "Time existing only in the mind's memory and expectation", "Free will and divine grace"],
+    world: "Constantinople became the new imperial capital, Germanic kingdoms replaced Roman rule in the west, and monasteries began preserving books through the coming centuries.",
+    legacy: "Augustine was the most influential thinker in western Christianity for a thousand years, and Neoplatonism shaped Christian, Islamic and Jewish mysticism." },
+  "islamic-golden-age": {
+    shaped: ["Translation of Greek, Syriac, Persian and Sanskrit books into Arabic", "The Abbasid caliphs' patronage in Baghdad", "Paper-making learned from China", "Questions raised by the Qur'an about God, freedom and creation"],
+    ideas: ["Avicenna's distinction between essence and existence", "The 'floating man': self-awareness without the senses", "Al-Ghazali's critique of causation, centuries before Hume", "Averroes's commentaries defending reason alongside faith"],
+    world: "Scholars in Baghdad, Cairo and Córdoba advanced algebra, optics, medicine and astronomy; hospitals and observatories flourished from Persia to Spain.",
+    legacy: "Arabic translations and commentaries carried Aristotle back to Europe, where Averroes and Avicenna became required reading in the first universities." },
+  "scholasticism": {
+    shaped: ["Aristotle's works, newly translated from Arabic and Greek", "The Church's need to train clergy and lawyers", "Growing towns and trade guilds", "Islamic and Jewish philosophers, such as Averroes and Maimonides"],
+    ideas: ["Anselm's ontological argument for God", "Aquinas's Five Ways and his synthesis of faith and reason", "Nominalism: universals are only names", "Ockham's razor: do not multiply entities beyond necessity"],
+    world: "Gothic cathedrals rose across Europe, the Crusades brought contact with the Islamic world, and the Black Death of 1347 killed perhaps a third of Europe.",
+    legacy: "The disputation method, the university degree and much of Western legal and scientific vocabulary come from the scholastics." },
+  "neo-confucian-zen": {
+    shaped: ["Buddhism and Taoism, which challenged Confucian thought", "The Song civil-service exams, open to talent", "Printing, which spread the classics widely", "Chan Buddhism carried from China to Japan"],
+    ideas: ["Li and qi: principle and the material force of the world", "The investigation of things as a path to moral wisdom", "Wang Yangming's unity of knowledge and action", "Zazen: just sitting, as enlightenment itself"],
+    world: "Song China invented movable type, gunpowder weapons and the compass for navigation; Japan's samurai age saw Zen shape tea, gardens and swordsmanship.",
+    legacy: "Zhu Xi's commentaries were the core of the Chinese exams until 1905, and Zen shaped Japanese culture and, later, Western ideas of meditation." },
+  "renaissance": {
+    shaped: ["Greek scholars and manuscripts arriving from Byzantium", "Wealthy city-states and patrons such as the Medici", "The printing press, after 1450", "Voyages that revealed new continents"],
+    ideas: ["Human dignity and freedom to shape oneself", "Political realism: how power really works", "Humanist scholarship that checked ancient texts at the source", "Montaigne's scepticism and self-examination"],
+    world: "Gutenberg printed his Bible, Columbus reached the Americas, Luther started the Reformation in 1517, and Copernicus put the Sun at the centre of the cosmos.",
+    legacy: "Humanism shaped modern education and individualism, and Machiavelli founded modern political science." },
+  "age-of-reason": {
+    shaped: ["The Scientific Revolution of Galileo and Kepler", "Religious wars that made certainty feel urgent", "The English Civil War and the Dutch Republic's freedoms", "The new mathematics of analytic geometry and calculus"],
+    ideas: ["'I think, therefore I am' and radical doubt", "Mind and body as separate substances (dualism)", "The social contract as the basis of government", "Locke's mind as a blank slate, filled by experience"],
+    world: "Newton published his laws of motion and gravity in 1687, the Royal Society was founded, and the Glorious Revolution limited the English monarchy.",
+    legacy: "Rationalism and empiricism became the two great camps of modern philosophy, and social contract theory underpins modern democracies." },
+  "enlightenment": {
+    shaped: ["Newton's success, which suggested reason could explain everything", "Coffee houses, salons and a booming print culture", "Religious intolerance and absolute monarchy", "Travel accounts of other societies"],
+    ideas: ["Hume's problem of induction and his doubts about causation", "Kant's synthesis: the mind structures experience", "Separation of powers and religious toleration", "Free markets and the division of labour", "Equal rights, including for women"],
+    world: "The American Revolution of 1776 and the French Revolution of 1789 turned Enlightenment ideas into constitutions; the Industrial Revolution began in Britain.",
+    legacy: "Human rights, secular government, modern economics and the ideal of public reason all come from this century." },
+  "idealism": {
+    shaped: ["Kant's critical philosophy", "The French Revolution and Napoleon's wars", "A reaction against the cold mechanism of the Enlightenment", "Rediscovery of Indian texts in Europe"],
+    ideas: ["Hegel's dialectic: history moves through conflict towards freedom", "Nature and spirit as one living whole", "The sublime: beauty mixed with awe and terror", "Schopenhauer's blind will to live"],
+    world: "Revolutions swept Europe in 1848, nationalism unified Germany and Italy, and Romantic poetry, music and painting flourished.",
+    legacy: "Hegel's ideas shaped Marx, existentialism and modern ideas of history, and Romanticism shaped how we think of art and nature." },
+  "suspicion": {
+    shaped: ["Hegel's philosophy of history", "The Industrial Revolution and its working poor", "Darwin's theory of evolution (1859)", "The decline of religious belief among the educated"],
+    ideas: ["Class struggle and historical materialism", "The death of God and the will to power", "Subjective truth and the leap of faith", "Pragmatism: ideas are true if they work", "Mill's greatest happiness principle"],
+    world: "Railways, telegraphs and factories remade daily life; European empires reached their height, and the vote began to spread to working men.",
+    legacy: "Marxism shaped revolutions and states, Nietzsche and Kierkegaard founded existentialism, and pragmatism became America's own philosophy." },
+  "logic-language": {
+    shaped: ["Frege's new logic", "Einstein's relativity and quantum physics", "The shock of the First World War", "Debates about the foundations of mathematics"],
+    ideas: ["Logical analysis as the method of philosophy", "Wittgenstein's picture theory, later replaced by meaning as use", "The verification principle", "Falsifiability, and paradigm shifts in science"],
+    world: "Two world wars, the Russian Revolution and the rise of computing; Turing's work on computation grew out of the same debates about logic.",
+    legacy: "Analytic philosophy dominates English-speaking universities, and its logic underlies computer science and linguistics." },
+  "existence": {
+    shaped: ["Husserl's phenomenology", "Kierkegaard and Nietzsche", "Two world wars, occupation and the Holocaust", "Paris café culture and literary magazines"],
+    ideas: ["Being-in-the-world and authenticity", "Existence precedes essence", "'One is not born, but becomes, a woman'", "The absurd: the clash between our need for meaning and a silent universe"],
+    world: "Post-war reconstruction, the Cold War, decolonisation in Algeria and elsewhere, and the student protests of 1968.",
+    legacy: "Existentialism influenced literature, theatre and psychotherapy, and The Second Sex launched modern feminist theory." },
+  "justice-global": {
+    shaped: ["Totalitarianism and the Holocaust", "Decolonisation across Africa and Asia", "The civil rights and women's movements", "Environmental crisis and new technology"],
+    ideas: ["The veil of ignorance as a test of justice", "The banality of evil", "Power/knowledge and how institutions shape people", "Ubuntu: a person is a person through other persons", "Moral concern for animals and the planet"],
+    world: "The end of empires, the Cold War and its end, the internet, globalisation and climate change.",
+    legacy: "Today's debates about rights, inequality, identity, AI and climate draw directly on this period's thinkers." },
+};

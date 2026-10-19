@@ -95,11 +95,13 @@ The switches at the top of the panel turn layers on and off: **Events**, **Think
 **Philosophy** and **Art**, at the bottom of the side panel (or **⌘3** and **⌘4** in the Mac app), open two illustrated pages that tell each story era by era: seventeen eras each, from the Upanishads to today and from Ice Age caves to today.
 
 - **The strip at the top** is a timeline of the eras. Click one to jump there; it follows you as you scroll.
-- **Each era** opens with a grand picture, then an introduction. Philosophy eras list the big questions people argued about and the thinkers of the age; art eras show a gallery of famous works.
-- **Click any thinker, work or topic** for a card with a Wikipedia summary and picture.
+- **Each era** fills the window with its picture. Scroll down and the story rises over it: an introduction, then the big questions and thinkers of the age (philosophy) or a gallery of famous works (art).
+- **The fuller picture** follows: what shaped the era, its breakthrough ideas or new techniques, the world around it, and what it led to.
+- **Click any thinker, work or topic** to read the whole article without leaving Palimpsest. Links inside it open the next article, and **← Back** returns.
+- **Zoom into any picture.** Click the era's picture, or any picture in an article, to open the viewer. Scroll or pinch to zoom, drag to move, double-click to zoom in, and **Fit** to see it whole. It loads a high-resolution version, so you can get close to the brushwork.
 - **See it on the globe** opens the time machine at that era and place, with the thinkers or art layer switched on.
 
-> **Try it:** open **Art**, pick *Ukiyo-e* in the strip and click *The Great Wave off Kanagawa*.
+> **Try it:** open **Art**, pick *Ukiyo-e* in the strip, click the picture and zoom into the boats under the wave.
 
 ## 8. Take a guided journey
 

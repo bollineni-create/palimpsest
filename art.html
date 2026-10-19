@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/eras.css?v=202610182140">
+<link rel="stylesheet" href="css/eras.css?v=202610190144">
 </head>
 <body data-subject="art">
 <header class="bar">
@@ -26,16 +26,24 @@
 <nav class="strip" id="strip" aria-label="Eras"></nav>
 <main id="eras"></main>
 <aside class="reader" id="reader" hidden aria-live="polite">
-  <button type="button" class="x" id="closeReader" aria-label="Close">×</button>
+  <div class="reader-top"><button type="button" class="back" id="rBack" hidden>← Back</button><button type="button" class="x" id="closeReader" aria-label="Close">×</button></div>
   <div class="tag" id="rTag"></div>
   <h3 id="rTitle"></h3>
   <p class="sub" id="rSub"></p>
-  <img id="rImg" alt="" hidden>
-  <p id="rText"></p>
-  <div class="reader-foot"><a id="rLink" target="_blank" rel="noopener">Read more on Wikipedia ↗</a><a id="rGlobe">See on the globe →</a></div>
+  <button type="button" class="lead-pic" id="rPic" hidden aria-label="Zoom into the picture"><img id="rImg" alt=""><span>⤢ Zoom</span></button>
+  <p class="lead" id="rText"></p>
+  <a class="globe small" id="rGlobe">See on the globe →</a>
+  <div class="article" id="rArticle"></div>
+  <p class="credit">Text and pictures from <a id="rLink" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA 4.0) and Wikimedia Commons.</p>
 </aside>
-<script src="js/data/thinkers.js?v=202610182140"></script>
-<script src="js/data/art-eras.js?v=202610182140"></script>
-<script src="js/eras.js?v=202610182140"></script>
+<div class="viewer" id="viewer" hidden role="dialog" aria-label="Picture viewer">
+  <div class="stage" id="vStage"><img id="vImg" alt="" draggable="false"></div>
+  <div class="v-top"><span id="vTitle"></span><button type="button" id="vClose" aria-label="Close">×</button></div>
+  <div class="v-tools"><button type="button" id="vOut" aria-label="Zoom out">−</button><button type="button" id="vFit">Fit</button><button type="button" id="vIn" aria-label="Zoom in">+</button></div>
+  <p class="v-hint">Scroll or pinch to zoom · drag to move · double-click to zoom in</p>
+</div>
+<script src="js/data/thinkers.js?v=202610190144"></script>
+<script src="js/data/art-eras.js?v=202610190144"></script>
+<script src="js/eras.js?v=202610190144"></script>
 </body>
 </html>

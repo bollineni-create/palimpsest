@@ -72,3 +72,92 @@ const ART_ERAS = [
     works: ["Campbell's Soup Cans", "Spiral Jetty", "The Dinner Party", "Maman (sculpture)", "Cloud Gate", "Guggenheim Museum Bilbao"],
     topics: ["Abstract expressionism", "Pop art", "Minimalism", "Conceptual art", "Contemporary art", "Street art"] },
 ];
+
+// The fuller picture of each era. shaped: what influenced it; ideas: new techniques and discoveries; world: what else was happening; legacy: what it led to.
+const ART_DEPTH = {
+  "cave": {
+    shaped: ["Life as mobile hunter-gatherers following herds", "The animals people depended on: bison, horses, mammoths, deer", "Ritual and gatherings in caves and rock shelters", "Cold Ice Age climates"],
+    ideas: ["Pigments of ochre, charcoal and manganese, blown or brushed on rock", "Using the bumps of the cave wall to give animals volume", "Hand stencils, made by blowing paint around a hand", "Carving in ivory, bone and stone; the first musical instruments"],
+    world: "Modern humans spread from Africa across every continent except Antarctica, living alongside Neanderthals until about 40,000 years ago.",
+    legacy: "These are the oldest surviving pictures, proof that the urge to make images is as old as our species." },
+  "egypt": {
+    shaped: ["Belief in an afterlife that needed images and objects", "The pharaoh as a living god", "The Nile's yearly flood and the order it brought", "Hieroglyphic writing, itself made of pictures"],
+    ideas: ["A canon of proportions based on a grid", "Composite view: head and legs in profile, eye and shoulders from the front", "Monumental stone building on a vast scale", "Faience, glass and gold-working"],
+    world: "Egypt's kingdoms rose and fell over three millennia, trading with Nubia, the Levant and Mesopotamia, until Rome took control in 30 BC.",
+    legacy: "Egyptian forms influenced early Greek sculpture, and Egyptology has fascinated the world since the 1800s." },
+  "mesopotamia": {
+    shaped: ["The first cities, such as Uruk and Ur", "Kings who claimed their power from the gods", "Clay as the main material, with little stone", "Wars and empires: Akkad, Assyria, Babylon, Persia"],
+    ideas: ["Cylinder seals, rolled across clay as signatures", "Narrative relief carving that tells a story in sequence", "Glazed brick in brilliant colours", "Writing in cuneiform, the world's first script"],
+    world: "Mesopotamia invented writing, the wheel, law codes and the 60-minute hour; Persia built the largest empire the world had yet seen.",
+    legacy: "Its winged bulls, lions and ziggurats shaped the art of Persia and Greece, and its stories reached the Bible." },
+  "classical-greece": {
+    shaped: ["Athletic games and the celebration of the human body", "Egyptian sculpture, which early Greeks copied", "Victory over Persia and civic pride", "Philosophy's search for ideal form and proportion"],
+    ideas: ["Contrapposto: weight on one leg, giving a natural stance", "Ideal proportions, set out in Polykleitos's Canon", "Bronze casting of life-size figures", "The orders of architecture: Doric, Ionic and Corinthian"],
+    world: "Athenian democracy, theatre, history writing and philosophy flourished, while Athens and Sparta fought the Peloponnesian War.",
+    legacy: "Greek art defined 'classical' beauty for the Romans, the Renaissance and neoclassical art and architecture to this day." },
+  "rome": {
+    shaped: ["Greek art, collected and copied in huge numbers", "Etruscan portrait traditions", "The needs of a vast empire: roads, cities, propaganda", "Ancestor masks kept in Roman homes"],
+    ideas: ["Concrete, which made domes and arches possible", "Realistic, unflattering portraits", "Floor mosaics and wall frescoes in homes", "Triumphal arches and columns that told victories in stone"],
+    world: "The Roman Empire spread law, Latin and cities from Britain to Syria, and Christianity rose to become its official religion.",
+    legacy: "Roman architecture shaped government buildings worldwide, and Pompeii's buried frescoes revived ancient style in the 1700s." },
+  "early-china": {
+    shaped: ["The first emperor's drive for unity and immortality", "Confucian ideals of learning and order", "Buddhism arriving along the Silk Road", "Silk trade with Central Asia and Rome"],
+    ideas: ["Mass production of figures from moulds, in the Terracotta Army", "Paper, invented under the Han", "Calligraphy as the highest art", "Three-colour sancai glazes under the Tang"],
+    world: "The Han and Tang dynasties rivalled Rome and Baghdad in size and wealth, with the Silk Road linking them all.",
+    legacy: "Chinese calligraphy, ceramics and Buddhist art shaped Korea, Japan and Vietnam for centuries." },
+  "byzantine": {
+    shaped: ["Christian worship and theology", "Roman imperial art and Greek learning", "The emperor as God's representative on earth", "Debates about whether holy images were allowed"],
+    ideas: ["Gold-ground mosaics that glow in candlelight", "Icons painted to a sacred formula", "The pendentive dome of Hagia Sophia", "Flat, frontal figures to suggest the eternal"],
+    world: "The eastern Roman Empire lasted a thousand years after Rome fell, until the Ottomans took Constantinople in 1453.",
+    legacy: "Byzantine icons shaped Orthodox Christian art in Russia and the Balkans, and its domes inspired Ottoman mosques." },
+  "islamic": {
+    shaped: ["Islam's caution about images of living beings in religious settings", "The Qur'an and the beauty of its Arabic script", "Persian, Byzantine and Indian traditions", "Mathematics and astronomy"],
+    ideas: ["Geometric patterns that repeat infinitely", "Calligraphy as architectural decoration", "Muqarnas: honeycomb vaulting", "Lustreware, carpets and miniature painting"],
+    world: "Islamic empires stretched from Spain to India, with great cities in Córdoba, Cairo, Baghdad, Isfahan, Istanbul and Delhi.",
+    legacy: "Islamic patterns shaped Spanish, Venetian and later Art Deco design, and the Taj Mahal is among the most visited buildings on Earth." },
+  "gothic": {
+    shaped: ["The power and wealth of the Church", "Growing towns that competed with each other", "Pilgrimage and the cult of relics", "Theology of God as light"],
+    ideas: ["Pointed arches, ribbed vaults and flying buttresses", "Walls of stained glass", "Illuminated manuscripts with gold leaf", "More natural, expressive sculpture"],
+    world: "Crusades, the founding of universities, the Black Death and the Hundred Years' War all shaped medieval Europe.",
+    legacy: "Gothic revival shaped the 1800s, from the Houses of Parliament to university campuses." },
+  "song": {
+    shaped: ["Taoist and Buddhist reverence for nature", "Scholar-officials who painted as well as governed", "Retreat from politics after the Mongol conquest", "A booming economy and printing"],
+    ideas: ["Monumental landscape with shifting viewpoints", "Ink-wash techniques with expressive brushwork", "Poems written on paintings", "Celadon and porcelain of unmatched refinement"],
+    world: "Song China was the world's most advanced economy, with paper money, movable type and the compass, before the Mongols took over in 1279.",
+    legacy: "Chinese landscape painting shaped East Asian art for centuries and inspired Western artists from the 1800s." },
+  "renaissance": {
+    shaped: ["Rediscovery of ancient Roman ruins and Greek texts", "Rich patrons: the Medici, the popes, Venetian merchants", "Humanist ideals of human dignity", "Anatomy and mathematics"],
+    ideas: ["Linear perspective, with a single vanishing point", "Oil painting, perfected in Flanders", "Sfumato: soft, smoky transitions", "Accurate anatomy, learned from dissection"],
+    world: "The printing press, the voyages of Columbus and Vasco da Gama, the Reformation, and Copernicus's Sun-centred universe.",
+    legacy: "The Renaissance defined the Western idea of the artist as a genius, and its works remain the most famous in the world." },
+  "baroque": {
+    shaped: ["The Catholic Counter-Reformation's need to move worshippers", "Absolute monarchs such as Louis XIV", "Wealthy Dutch merchants buying art for their homes", "The Scientific Revolution's interest in light and optics"],
+    ideas: ["Chiaroscuro and tenebrism: dramatic light out of darkness", "Movement and emotion frozen at their peak", "Genre scenes, still lifes and landscapes for an art market", "Illusionistic ceilings that open to the sky"],
+    world: "The Thirty Years' War, Dutch global trade, the Scientific Revolution and the court of Versailles.",
+    legacy: "Baroque drama shaped theatre, opera and film lighting; Rembrandt and Vermeer remain models of observation." },
+  "ukiyo-e": {
+    shaped: ["Japan's long peace under the Tokugawa shoguns", "A wealthy urban merchant class in Edo", "Kabuki theatre and the pleasure quarters", "European perspective learned from Dutch prints"],
+    ideas: ["Multi-colour woodblock printing (nishiki-e)", "Teamwork of designer, carver, printer and publisher", "Bold outlines, flat colour and unusual cropping", "Landscape series for travellers and armchair tourists"],
+    world: "Japan was largely closed to foreign trade until 1853, when American ships forced it open, and the Meiji Restoration modernised the country.",
+    legacy: "Japonisme shaped Impressionism, Art Nouveau and graphic design, and ukiyo-e is an ancestor of manga." },
+  "romanticism": {
+    shaped: ["The French Revolution and Napoleonic Wars", "Industrialisation and the loss of rural life", "Philosophy of the sublime", "Nationalism and interest in folk culture"],
+    ideas: ["Painting emotion and imagination over reason", "Nature as awe-inspiring and overwhelming", "Contemporary events painted on the scale of history", "Looser, expressive brushwork and colour"],
+    world: "Revolutions across Europe and Latin America, the abolition of the slave trade and the first railways.",
+    legacy: "Romanticism created our image of the passionate, independent artist and paved the way for modern art." },
+  "impressionism": {
+    shaped: ["The new, rebuilt Paris of boulevards and cafés", "Paint in portable tubes", "Photography, which freed painting from just recording", "Japanese prints"],
+    ideas: ["Painting outdoors to catch changing light", "Visible brushstrokes and pure, unmixed colour", "Pointillism: dots of colour mixed by the eye", "Expressive colour and form after Impressionism"],
+    world: "Electric light, railways and the Eiffel Tower; the Franco-Prussian War and the Paris Commune; European empires at their height.",
+    legacy: "Impressionism broke the academies' hold and opened the way for every modern movement." },
+  "modernism": {
+    shaped: ["Industrial machines, cars and aeroplanes", "African and Oceanic sculpture seen in Paris", "Freud's ideas about dreams and the unconscious", "The horror of the First World War"],
+    ideas: ["Cubism: showing many viewpoints at once", "Pure abstraction, with no subject at all", "Collage and the readymade", "Bauhaus design uniting art, craft and industry"],
+    world: "Two world wars, revolution in Russia, the Great Depression and the rise of cinema and radio.",
+    legacy: "Modernism reshaped architecture, design and typography, and set up the questions all later art responds to." },
+  "contemporary": {
+    shaped: ["The Second World War and exiled European artists", "Mass media, advertising and celebrity", "Civil rights, feminism and protest", "Globalisation and digital technology"],
+    ideas: ["Action painting and colour-field abstraction", "Pop art's use of commercial images", "Conceptual art: the idea is the work", "Installation, performance, land art, video and digital art"],
+    world: "The Cold War, decolonisation, the space race, the internet and a global art market.",
+    legacy: "Art is now made everywhere, in every medium, and the question 'what is art?' is part of the work itself." },
+};
