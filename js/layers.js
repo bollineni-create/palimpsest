@@ -168,7 +168,7 @@ function openArt(w) {
   $("pExtract").textContent = w.about || "From the open-access collection of the Cleveland Museum of Art.";
   $("pExtract").hidden = false;
   $("pLink").href = w.url; $("pLink").textContent = "See it at the Cleveland Museum of Art ↗";
-  $("place").hidden = false;
+  $("place").hidden = false; $("place").scrollTop = 0;
   state.selected = { kind: "artwork", name: w.title, text: `${w.title} (${w.date}) by ${w.artist || "an unknown maker"}, ${w.culture}. ${w.about}`.slice(0, 600) };
 }
 

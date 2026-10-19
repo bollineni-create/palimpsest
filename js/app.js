@@ -904,7 +904,7 @@ function eventRow(e, i, showImpact = false, rank = 0) {
   b.type = "button"; b.className = "ev" + (rank ? " ranked" : ""); b.dataset.i = i;
   b.innerHTML = (rank ? `<span class="rank">${rank}</span>` : "") + `<span class="d"></span><span><span class="x2"></span></span><span class="pin${e.at ? "" : " no"}"></span>`;
   b.querySelector(".d").textContent = e.m && e.d ? dayLabel(state.history.year, e.m, e.d, false) : e.date;
-  b.querySelector(".x2").textContent = e.text.length > 220 ? e.text.slice(0, 218) + "…" : e.text;
+  b.querySelector(".x2").textContent = e.text;
   if (showImpact) { const bar = document.createElement("span"); bar.className = "imp"; bar.style.width = Math.max(8, Math.round(Math.min(1, e.imp) * 100)) + "%"; b.querySelector(".x2").parentElement.appendChild(bar); }
   b.addEventListener("click", () => { if (e.m && e.d && state.history.exact && !(state.day && state.day.m === e.m && state.day.d === e.d)) selectDay(e.m, e.d, false); openEvent(state.history, i); });
   return b;
@@ -1076,6 +1076,7 @@ async function firstPicture(titles) {
 }
 async function fillSummary(title, search, pictureFrom) {
   const id = ++sumReq;
+  $("place").scrollTop = 0;
   $("pImg").hidden = true; $("pExtract").hidden = false; $("pExtract").textContent = "Loading…";
   const s = await summary(title, search).catch(() => null);
   if (id !== sumReq) return;
@@ -1148,6 +1149,8 @@ map.on("load", () => { state.ready = true; setYear(state.year, { exact: true });
 function placeOverlays() {
   const h = document.querySelector(".timeline").offsetHeight + 28;
   $("caption").style.bottom = h + "px";
+  const place = $("place");
+  if (innerWidth >= 760) place.style.maxHeight = `${innerHeight - h - 28}px`; else place.style.maxHeight = "";   // card sits 14px from the top and stops 14px above the timeline
   const guide = document.getElementById("guide");
   if (guide && innerWidth >= 760) guide.style.bottom = h + "px";
   $("drawer").style.bottom = (innerWidth < 760 ? "auto" : h + "px");
