@@ -60,7 +60,7 @@ const PROVIDERS = {
                   note: "Free and anonymous, run by Pollinations.ai. No key or account. Answers can be slower and less reliable, and your questions go to their service." },
 };
 const store = { get: k => { try { return localStorage.getItem(k) || ""; } catch { return ""; } }, set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} } };
-const providerId = () => PROVIDERS[store.get("palimpsest:guide-provider")] ? store.get("palimpsest:guide-provider") : "anthropic";
+const providerId = () => PROVIDERS[store.get("palimpsest:guide-provider")] ? store.get("palimpsest:guide-provider") : "pollinations";   // free, no key: works out of the box
 const provider = () => PROVIDERS[providerId()];
 const keyFor = id => id === "anthropic" ? store.get(KEY_STORE) : store.get(`palimpsest:key:${id}`);
 const setKeyFor = (id, v) => id === "anthropic" ? store.set(KEY_STORE, v) : store.set(`palimpsest:key:${id}`, v);
@@ -287,7 +287,7 @@ async function loadModels(pid) {
       } else {
         const r = await fetch("https://openrouter.ai/api/v1/models").then(r => r.json());
         const free = (r.data || []).filter(m => (m.id.endsWith(":free") || (m.pricing && m.pricing.prompt === "0" && m.pricing.completion === "0")) && (m.supported_parameters || []).includes("tools"));
-        const rank = id => [/gemma-4-31b/, /nemotron-3-super/, /gemma/, /nemotron/].findIndex(rx => rx.test(id));
+        const rank = id => [/deepseek/, /gemma-4-31b/, /nemotron-3-super/, /gemma/, /nemotron/].findIndex(rx => rx.test(id));
         modelCache[pid] = free.sort((a, b) => ((rank(a.id) + 99) % 99) - ((rank(b.id) + 99) % 99)).map(m => ({ id: m.id, name: m.name || m.id }));
       }
     } catch { return []; }
@@ -424,3 +424,22 @@ g("guideKeyForm").addEventListener("submit", async e => {
 });
 g("guideKeyRemove").addEventListener("click", () => { const pid = providerId(); setKeyFor(pid, ""); if (pid === "anthropic") client = null; delete modelCache[pid]; renderSettings("Key removed from this browser."); });
 yearHooks.push(() => { if (!g("guide").hidden && !busy) g("guideMoment").textContent = `From ${momentLabel()}`; });
+
+/* ---------- A short AI-written description, for map objects Wikipedia has no article on ---------- */
+const describeCache = new Map();
+async function describeWithAI(name, context) {
+  const key = `${name}|${context}`;
+  if (describeCache.has(key)) return describeCache.get(key);
+  const p = PROVIDERS.pollinations;
+  const job = fetch(p.endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+    model: p.fixedModel,
+    messages: [
+      { role: "system", content: "You write the description on a card in a historical atlas. Write 2 or 3 plain, factual sentences, no lists, no headings, no preamble. Describe what the named place, people or polity was at the given time. If the name is a broad label (for example a group of peoples), explain what it covers. Be cautious: say 'probably' or 'around' when unsure, and never invent specific names or dates." },
+      { role: "user", content: `Name: ${name}\nContext: ${context}` },
+    ] }) })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { const t = d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content; return t ? t.trim().replace(/^["“]|["”]$/g, "") : null; })
+    .catch(() => null);
+  describeCache.set(key, job);
+  return job;
+}

@@ -585,7 +585,7 @@ map.on("click", "b-fill", e => {
   $("pName").textContent = p.NAME;
   const ruler = p.SUBJECTO && p.SUBJECTO !== p.NAME ? `Ruled by or part of ${p.SUBJECTO}.` : (p.PARTOF && p.PARTOF !== p.NAME ? `Part of ${p.PARTOF}.` : "Independent in this era.");
   $("pSub").textContent = ruler;
-  state.selected = { kind: "region", name: p.NAME, text: ruler };
+  state.selected = { kind: "region", name: p.NAME, text: `${p.NAME}, a region on a historical map of ${fmtLabel(by)}. ${ruler}${p.SUBJECTO && p.SUBJECTO !== p.NAME ? "" : ""} Border precision: ${PRECISION[p.BORDERPRECISION] || "approximate"}` };
   $("pLink").href = "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(p.NAME);
   $("place").hidden = false;
   fillSummary(p.NAME, true);
@@ -1090,9 +1090,13 @@ async function summary(title, search = false) {
   const get = t => fetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_"))).then(r => r.ok ? r.json() : null);
   let s = await get(title);
   if ((!s || s.type === "disambiguation") && search) {
-    const r = await wikiApi({ action: "query", list: "search", srsearch: title, srlimit: 1 });
-    const hit = r.query && r.query.search[0];
+    // Accept a search result only if its title covers nearly every meaningful word of the name
+    const words = t => t.toLowerCase().replace(/[()]/g, "").split(/[\s,-]+/).filter(w => w.length > 2 && !/^(the|and|of)$/.test(w)).map(w => w.replace(/s$/, ""));
+    const want = words(title);
+    const r = await wikiApi({ action: "query", list: "search", srsearch: title, srlimit: 5 }).catch(() => null);
+    const hit = (r && r.query && r.query.search || []).find(h => { const got = words(h.title); return want.filter(w => got.some(g => g.startsWith(w) || w.startsWith(g))).length >= Math.max(1, want.length - (want.length > 3 ? 1 : 0)); });
     s = hit ? await get(hit.title) : null;
+    if (s && s.type === "disambiguation") s = null;
   }
   sumCache.set(key, s);
   return s;
@@ -1120,7 +1124,17 @@ async function fillSummary(title, search, pictureFrom) {
   $("pImg").hidden = true; $("pExtract").hidden = false; $("pExtract").textContent = "Loading…";
   const s = await summary(title, search).catch(() => null);
   if (id !== sumReq) return;
-  if (!s) { $("pExtract").hidden = true; }
+  $("pLink").textContent = "Read more on Wikipedia ↗";
+  $("pLink").href = "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(title);
+  $("aiNote").hidden = true;
+  if (!s) {
+    $("pExtract").textContent = "Writing a description…";
+    const context = (state.selected && state.selected.text) || `${fmtLabel(state.year)}`;
+    const text = typeof describeWithAI === "function" ? await describeWithAI(title, `${context}. Year on the map: ${fmtLabel(state.year)}.`) : null;
+    if (id !== sumReq) return;
+    if (text) { $("pExtract").textContent = text; $("aiNote").hidden = false; $("pLink").textContent = "Search Wikipedia ↗"; }
+    else $("pExtract").textContent = (state.selected && state.selected.text) || "No description is available for this yet.";
+  }
   else $("pExtract").textContent = s.extract;
   if (s && s.thumbnail && s.thumbnail.source) { $("pImg").src = (s.originalimage && s.originalimage.width <= 1200 ? s.originalimage.source : s.thumbnail.source); $("pImg").alt = s.title; $("pImg").hidden = false; }
   else if (pictureFrom && pictureFrom.length) {
