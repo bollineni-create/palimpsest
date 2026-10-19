@@ -136,6 +136,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard let page = sender.representedObject as? String else { return }
         load(page: page)
     }
+    @objc func showTutorial(_ sender: Any?) {
+        if currentPage != "home" { load(page: "home") }
+        webView.evaluateJavaScript("typeof startTutorial === 'function' && startTutorial()", completionHandler: nil)
+    }
+    @objc func openRepository(_ sender: Any?) {
+        if let url = URL(string: "https://github.com/bollineni-create/palimpsest/blob/main/TUTORIAL.md") { NSWorkspace.shared.open(url) }
+    }
     @objc func revealProject(_ sender: Any?) {
         if let folder = sourceFolder { NSWorkspace.shared.activateFileViewerSelecting([folder]) }
     }
@@ -187,6 +194,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         fs.keyEquivalentModifierMask = [.control, .command]
         view.addItem(fs)
         viewItem.submenu = view
+
+        let helpItem = NSMenuItem(); main.addItem(helpItem)
+        let help = NSMenu(title: "Help")
+        help.addItem(withTitle: "Palimpsest Tutorial", action: #selector(showTutorial(_:)), keyEquivalent: "")
+        help.addItem(withTitle: "Written Tutorial and Source Code", action: #selector(openRepository(_:)), keyEquivalent: "")
+        helpItem.submenu = help
+        NSApp.helpMenu = help
 
         let winItem = NSMenuItem(); main.addItem(winItem)
         let win = NSMenu(title: "Window")

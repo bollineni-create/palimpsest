@@ -41,7 +41,7 @@
   <div class="scroll" id="tab-tours" hidden></div>
   <div class="foot">
     <a href="compare.html" id="compareLink">Side-by-side compare →</a>
-    <span class="tag" title="← → years · [ ] days · space plays · T tilts">Keys: ← → [ ] space</span>
+    <button type="button" class="tut-btn" id="tutorialBtn">Tutorial</button>
   </div>
 </aside>
 <button class="open-drawer glass" id="openDrawer">☰ Maps &amp; journeys</button>
@@ -86,6 +86,22 @@
   </form>
   <p class="g-small g-model">Claude Opus 5.5 · answers can be wrong, so check what matters</p>
 </aside>
+
+<div class="tutorial" id="tutorial" hidden>
+  <div class="tut-spot" id="tutSpot" hidden></div>
+  <div class="tut-card glass center" id="tutCard" role="dialog" aria-modal="true" aria-labelledby="tutTitle">
+    <span class="tag" id="tutCount"></span>
+    <h2 id="tutTitle"></h2>
+    <p id="tutText"></p>
+    <div class="tut-row">
+      <button type="button" class="link" id="tutSkip">Skip tour</button>
+      <span>
+        <button type="button" class="pill" id="tutBack">Back</button>
+        <button type="button" class="pill tut-next" id="tutNext">Next</button>
+      </span>
+    </div>
+  </div>
+</div>
 
 <div class="caption glass" id="caption" hidden>
   <div class="tag" id="capTitle"></div>
@@ -148,5 +164,6 @@
 <script src="js/layers.js"></script>
 <script src="js/finetune.js"></script>
 <script src="js/guide.js"></script>
+<script src="js/tutorial.js"></script>
 </body>
 </html>

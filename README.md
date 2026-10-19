@@ -5,6 +5,8 @@
 <p align="center"><b>A journey through time on a 3D globe, from the Big Bang to yesterday.</b><br>
 Drag the timeline and the world changes with it: historical borders, old maps laid over the land, drifting continents in deep time, and what happened on each day.</p>
 
+<p align="center"><b><a href="https://bollineni-create.github.io/palimpsest/">Open Palimpsest in your browser</a></b> · <a href="TUTORIAL.md">Tutorial</a></p>
+
 ![Palimpsest showing Europe in 1914](docs/screenshot-1914.jpg)
 
 ## What it does
@@ -26,6 +28,8 @@ Drag the timeline and the world changes with it: historical borders, old maps la
 ![The guide, with the thinkers alive in 1972](docs/screenshot-guide.jpg)
 
 ![The continents 66 million years ago](docs/screenshot-deep-time.jpg)
+
+New here? Read the **[tutorial](TUTORIAL.md)**. The app also opens with a short guided tour the first time, and you can replay it from **Tutorial** in the side panel.
 
 ## Run it
 
