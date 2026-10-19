@@ -2,7 +2,7 @@
 // Palimpsest · Philosophy and Art pages: each era as a grand picture, with its people, questions or works, and topics to explore
 
 const SUBJECT = document.body.dataset.subject;            // "philosophy" or "art"
-const ERAS = SUBJECT === "art" ? ART_ERAS : PHILOSOPHY_ERAS;
+const ERAS = (SUBJECT === "art" ? ART_ERAS : PHILOSOPHY_ERAS).slice().sort((a, b) => a.from - b.from || a.to - b.to);   // in date order
 const WIKI = "https://en.wikipedia.org";
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -72,7 +72,7 @@ const COPY = {
 }[SUBJECT];
 
 function renderStrip() {
-  $("strip").innerHTML = ERAS.map(e => `<a href="#${e.id}" data-id="${e.id}"><b>${esc(fmtYear(e.from))}</b><span>${esc(e.title)}</span></a>`).join("");
+  $("strip").innerHTML = `<div class="track">${ERAS.map(e => `<a href="#${e.id}" data-id="${e.id}" title="${esc(e.title)}, ${esc(fmtSpan(e))}"><i aria-hidden="true"></i><b>${esc(fmtYear(e.from))}</b><span>${esc(e.title)}</span></a>`).join("")}</div>`;
 }
 // The fuller picture: what shaped the era, its breakthroughs, the world around it and what it led to
 const DEPTH = SUBJECT === "art" ? ART_DEPTH : PHILOSOPHY_DEPTH;
@@ -160,9 +160,11 @@ function markCurrent(instant) {
   const id = best ? best.id : "";
   if (id === current) return;
   current = id;
-  document.querySelectorAll("#strip a").forEach(a => {
+  const at = ERAS.findIndex(e => e.id === id);
+  document.querySelectorAll("#strip a").forEach((a, i) => {
     const on = a.dataset.id === id;
     a.classList.toggle("on", on);
+    a.classList.toggle("past", at >= 0 && i < at);
     if (on) { const strip = $("strip"); strip.scrollTo({ left: a.offsetLeft - strip.clientWidth / 2 + a.offsetWidth / 2, behavior: instant ? "instant" : "smooth" }); }
   });
   history.replaceState(null, "", id ? "#" + id : location.pathname);
