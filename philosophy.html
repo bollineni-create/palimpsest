@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Palimpsest Philosophy</title>
+<meta name="description" content="The story of philosophy, era by era: the thinkers, the big questions and the ideas to explore, from the Upanishads to today.">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<script>try { const t = localStorage.getItem("palimpsest:theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/eras.css?v=202610182140">
+</head>
+<body data-subject="philosophy">
+<header class="bar">
+  <a class="brand" href="index.html"><img src="assets/icon.png" alt="">Palimpsest</a>
+  <nav class="views" aria-label="Views">
+    <a href="index.html">Time machine</a>
+    <a href="compare.html">Compare</a>
+    <a href="philosophy.html" data-view="philosophy">Philosophy</a>
+    <a href="art.html" data-view="art">Art</a>
+  </nav>
+  <button type="button" class="theme" id="themeBtn" aria-label="Appearance"></button>
+</header>
+<nav class="strip" id="strip" aria-label="Eras"></nav>
+<main id="eras"></main>
+<aside class="reader" id="reader" hidden aria-live="polite">
+  <button type="button" class="x" id="closeReader" aria-label="Close">×</button>
+  <div class="tag" id="rTag"></div>
+  <h3 id="rTitle"></h3>
+  <p class="sub" id="rSub"></p>
+  <img id="rImg" alt="" hidden>
+  <p id="rText"></p>
+  <div class="reader-foot"><a id="rLink" target="_blank" rel="noopener">Read more on Wikipedia ↗</a><a id="rGlobe">See on the globe →</a></div>
+</aside>
+<script src="js/data/thinkers.js?v=202610182140"></script>
+<script src="js/data/philosophy-eras.js?v=202610182140"></script>
+<script src="js/eras.js?v=202610182140"></script>
+</body>
+</html>

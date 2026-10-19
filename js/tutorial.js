@@ -13,9 +13,9 @@ const TUTORIAL = [
     before: () => { setYear(1914, { exact: true }); map.flyTo({ center: [16, 46], zoom: 3.2, pitch: 0, bearing: 0, duration: 1600 }); } },
   { target: "#tab-history", title: "What happened", text: "The History panel ranks the year's biggest events. Brighter calendar squares are bigger days: click one, or press [ and ], to step day by day. Red pins put events on the globe.",
     before: () => selectTab("history") },
-  { target: "#layerChips", title: "Thinkers and art", text: "Switch on layers for the philosophers alive at the time and for real artworks from the period, shown where they were made." },
+  { target: "#layerChips", title: "Thinkers and art", text: "Switch on layers for the philosophers alive at the time and for real artworks from the period, shown where they were made. Philosophy and Art, at the bottom of the panel, tell each story era by era." },
   { target: '.tabs button[data-tab="tours"]', title: "Guided journeys", text: "Seventeen journeys fly you through big stories, from the Big Bang to you, the Silk Road and the Second World War. Old maps lists the historical maps on the globe." },
-  { target: "#askBtn", title: "Ask the guide", text: "Ask Claude about wherever you are. It knows the moment and what's on screen, and it can take you places. The first time, you'll add your own Anthropic API key, which stays on this device." },
+  { target: "#askBtn", title: "Ask the guide", text: "Ask an AI guide about wherever you are. It knows the moment and what's on screen, and it can take you places. It starts on a free model with no key; Settings lets you switch to Claude, ChatGPT or other free models." },
   { title: "You're ready", text: "Keys: ← → step years · [ ] step days · Space plays · T tilts · Esc hides the panel. Replay this tour any time from Tutorial at the bottom of the panel.", end: true },
 ];
 let tutStep = -1;

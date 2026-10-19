@@ -69,7 +69,7 @@ Before written history there are no year-by-year lists, so the panel shows a sum
 ## 5. Explore the map
 
 - **Click any region** to see its name in that era, who ruled it, and a Wikipedia summary. Borders come from a historical atlas and get rougher the further back you go.
-- **Old maps** appear when the timeline reaches their years: London in the 1890s, Cassini's France, Switzerland edition by edition, post-war Tokyo from the air. Gold dots mark them when you're zoomed out. The **Old maps** tab lists them all, and **Side-by-side compare** (at the bottom of the panel) opens a viewer with fade, swipe and spyglass modes.
+- **Old maps** appear when the timeline reaches their years: London in the 1890s, Cassini's France, Switzerland edition by edition, post-war Tokyo from the air. Gold dots mark them when you're zoomed out. The **Old maps** tab lists them all, and **Compare maps** (at the bottom of the panel) opens a viewer with fade, swipe and spyglass modes.
 - **Now ↔ Then** blends between today's satellite imagery and the historical layers.
 - **Place names** adds today's labels on top.
 
@@ -90,7 +90,18 @@ The switches at the top of the panel turn layers on and off: **Events**, **Think
 
 > **Try it:** type `1505` and zoom into Italy.
 
-## 7. Take a guided journey
+## 7. The story of philosophy and the story of art
+
+**Philosophy** and **Art**, at the bottom of the side panel (or **⌘3** and **⌘4** in the Mac app), open two illustrated pages that tell each story era by era: seventeen eras each, from the Upanishads to today and from Ice Age caves to today.
+
+- **The strip at the top** is a timeline of the eras. Click one to jump there; it follows you as you scroll.
+- **Each era** opens with a grand picture, then an introduction. Philosophy eras list the big questions people argued about and the thinkers of the age; art eras show a gallery of famous works.
+- **Click any thinker, work or topic** for a card with a Wikipedia summary and picture.
+- **See it on the globe** opens the time machine at that era and place, with the thinkers or art layer switched on.
+
+> **Try it:** open **Art**, pick *Ukiyo-e* in the strip and click *The Great Wave off Kanagawa*.
+
+## 8. Take a guided journey
 
 Open the **Journeys** tab and pick one. Palimpsest flies you from stop to stop with a caption at each; use **Next** and **Back**, or **End journey**. There are seventeen, including:
 
@@ -102,19 +113,19 @@ Open the **Journeys** tab and pick one. Palimpsest flies you from stop to stop w
 - **Life conquers the land** and **The great extinctions**
 - **Wonders of the ancient world** and **Ice Age humans**
 
-## 8. Ask the guide
+## 9. Ask the guide
 
 **✦ Ask about this moment** (on the timeline) and **✦ Ask the guide** (on any card) open a chat with an AI guide. The guide knows the moment, where the globe is pointed and what's on screen, and answers like a museum guide. It can also move the globe and switch layers to show you what it's describing.
 
 ![The guide panel](docs/screenshot-guide.jpg)
 
-**Choosing an AI (once):** open the guide and press **Settings**. Pick one of four providers:
+**Choosing an AI:** the guide starts on a free model with no key needed (Pollinations). To change it, open the guide and press **Settings**, then pick one of four providers:
 
 | Provider | Needs | Cost |
 | --- | --- | --- |
 | **Claude** (Anthropic) | an API key from the [Anthropic Console](https://console.anthropic.com/settings/keys) | billed to your Anthropic account |
 | **ChatGPT** (OpenAI) | an API key from the [OpenAI dashboard](https://platform.openai.com/api-keys); then pick a model | billed to your OpenAI account |
-| **Free models · OpenRouter** | a free [OpenRouter](https://openrouter.ai/keys) account and key; then pick one of the free models | free, with daily limits |
+| **Free models · OpenRouter** | a free [OpenRouter](https://openrouter.ai/keys) account and key; then pick one of the free models | free, with daily limits; DeepSeek is listed first whenever a free version is offered |
 | **Free, no key · Pollinations** | nothing | free and anonymous, but slower and less reliable, and your questions go to Pollinations.ai |
 
 Paste the key and press **Save key**. Keys are saved only in your browser (or the Mac app) and sent only to that provider; **Remove saved key** deletes one. Switching provider starts a fresh conversation. All four can move the globe for you, except a few free models that don't support tools: those still answer, but can't take you places.
@@ -130,7 +141,7 @@ Paste the key and press **Save key**. Keys are saved only in your browser (or th
 
 **New** starts a fresh conversation. The guide can be wrong, so check anything important.
 
-## 9. The Mac app
+## 10. The Mac app
 
 The repository includes a native Mac app. To build and install it:
 
@@ -138,7 +149,7 @@ The repository includes a native Mac app. To build and install it:
 ./app/macos/build.sh
 ```
 
-It opens Palimpsest in its own window, with menus for **Time Machine** (⌘1), **Side-by-side Compare** (⌘2), **Play or Pause Time** (⌘P), **Tilt to 3D** (⌘T) and **Help → Palimpsest Tutorial**. It reads the site straight from the folder you built it in and reloads within a second whenever a file changes, which makes it a live preview while you work on the code.
+It opens Palimpsest in its own window, with menus for **Time Machine** (⌘1), **Side-by-side Compare** (⌘2), **Philosophy** (⌘3), **Art** (⌘4), **Play or Pause Time** (⌘P), **Tilt to 3D** (⌘T) and **Help → Palimpsest Tutorial**. It reads the site straight from the folder you built it in and reloads within a second whenever a file changes, which makes it a live preview while you work on the code.
 
 ## Keyboard shortcuts
 
@@ -158,4 +169,5 @@ It opens Palimpsest in its own window, with menus for **Time Machine** (⌘1), *
 - **Deep time fills in slowly.** Each ancient-continent snapshot takes about five seconds to build the first time.
 - **No events for a year.** Some years have little on Wikipedia, especially outside Europe and before about AD 1000. Try the decade around it.
 - **A journey stopped.** Journeys now resume from the same stop after a reload, so if the page refreshes (for example the Mac app picking up an update), you carry on where you were.
+- **A card says "Written by AI".** Wikipedia has no article on that region or item, so the free model wrote a short description from the map's data. Treat it as a starting point.
 - **The guide says the key was rejected.** Check you copied the whole key (it starts with `sk-ant-`), and that your Anthropic account has credit.

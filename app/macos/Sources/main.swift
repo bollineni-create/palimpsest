@@ -9,7 +9,7 @@ import WebKit
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigationDelegate, WKUIDelegate {
     var window: NSWindow!
     var webView: WKWebView!
-    var currentPage = "home"            // "home" (time machine) or "compare"
+    var currentPage = "home"            // "home" (time machine), "compare", "philosophy" or "art"
     var lastSignature = ""
     var showingLive = false
 
@@ -17,8 +17,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard let path = Bundle.main.object(forInfoDictionaryKey: "PalimpsestSourceFolder") as? String, !path.isEmpty else { return nil }
         return URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
     }()
-    let livePages = ["home": "index.html", "compare": "compare.html"]
-    let bundledPages = ["home": "index.html", "compare": "compare.html"]
+    let livePages = ["home": "index.html", "compare": "compare.html", "philosophy": "philosophy.html", "art": "art.html"]
+    let bundledPages = ["home": "index.html", "compare": "compare.html", "philosophy": "philosophy.html", "art": "art.html"]
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         buildMenu()
@@ -106,10 +106,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // keep track of in-page links between the two pages
+        // keep track of in-page links between the pages, so a live reload stays on the same one
         let name = webView.url?.lastPathComponent ?? ""
-        if name == "palimpsest.html" { currentPage = "compare" }
-        else if name == "timemachine.html" || name == "index.html" { currentPage = "home" }
+        if let page = livePages.first(where: { $0.value == name })?.key { currentPage = page }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -181,6 +180,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         home.representedObject = "home"; view.addItem(home)
         let compare = NSMenuItem(title: "Side-by-side Compare", action: #selector(openPage(_:)), keyEquivalent: "2")
         compare.representedObject = "compare"; view.addItem(compare)
+        let philosophy = NSMenuItem(title: "Philosophy", action: #selector(openPage(_:)), keyEquivalent: "3")
+        philosophy.representedObject = "philosophy"; view.addItem(philosophy)
+        let art = NSMenuItem(title: "Art", action: #selector(openPage(_:)), keyEquivalent: "4")
+        art.representedObject = "art"; view.addItem(art)
         view.addItem(.separator())
         for (title, key, js) in [("Play or Pause Time", "p", " "), ("Tilt to 3D", "t", "t"), ("Show or Hide Panel", "l", "Escape")] {
             let item = NSMenuItem(title: title, action: #selector(sendKey(_:)), keyEquivalent: key)

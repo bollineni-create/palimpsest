@@ -1194,8 +1194,18 @@ renderThemeBtn();
 map.on("load", applyTheme);
 buildTicks();
 renderTours();
+// A link from the Philosophy or Art pages (index.html?year=-430&at=23.7,38,6) opens at that moment and place
+const linked = (() => {
+  const q = new URLSearchParams(location.search), y = parseFloat(q.get("year")), at = (q.get("at") || "").split(",").map(Number);
+  if (!isFinite(y)) return null;
+  history.replaceState(null, "", location.pathname + location.hash);
+  return { year: y, center: at.length >= 2 && at.every(isFinite) ? [at[0], at[1]] : null, zoom: at[2] || 4 };
+})();
 const restored = savedView();
-if (restored && typeof restored.year === "number") {
+if (linked) {
+  if (linked.center) map.jumpTo({ center: linked.center, zoom: linked.zoom, pitch: 0, bearing: 0 });
+  setYear(linked.year, { exact: true });
+} else if (restored && typeof restored.year === "number") {
   map.jumpTo({ center: restored.center, zoom: restored.zoom, pitch: restored.pitch, bearing: restored.bearing });
   setYear(restored.year, { exact: true });
 } else setYear(1900);

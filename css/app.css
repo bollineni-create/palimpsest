@@ -94,7 +94,8 @@ button, input { font: inherit; color: inherit; }
 .card .t { display: block; font: 400 16px/1.15 var(--f-display); }
 .card .s { display: block; font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
 .empty { padding: 8px 16px; color: var(--ink-soft); font-size: 13px; }
-.foot { border-top: 1px solid var(--line); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.foot { border-top: 1px solid var(--line); padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.foot .tut-btn { margin-left: auto; }
 .foot a { color: var(--brass); font-size: 12.5px; text-decoration: none; }
 .foot a:hover { text-decoration: underline; }
 .open-drawer { position: fixed; z-index: 6; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; padding: 8px 12px; cursor: pointer; font-weight: 500; }

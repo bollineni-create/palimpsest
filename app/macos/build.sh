@@ -22,7 +22,7 @@ cp Info.plist "$APP/Contents/"
 cp Resources/AppIcon.icns "$RES/"
 
 # Bundled fallback copy of the web app, with its libraries stored locally so it starts without a CDN
-cp "$ROOT/index.html" "$ROOT/compare.html" "$RES/"
+cp "$ROOT/index.html" "$ROOT/compare.html" "$ROOT/philosophy.html" "$ROOT/art.html" "$RES/"
 cp -R "$ROOT/css" "$ROOT/js" "$ROOT/assets" "$RES/"
 curl -fsSL -o "$RES/vendor/maplibre-gl.js"  "https://cdn.jsdelivr.net/npm/maplibre-gl@$MAPLIBRE/dist/maplibre-gl.js"
 curl -fsSL -o "$RES/vendor/maplibre-gl.css" "https://cdn.jsdelivr.net/npm/maplibre-gl@$MAPLIBRE/dist/maplibre-gl.css"

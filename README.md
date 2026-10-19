@@ -18,10 +18,11 @@ Drag the timeline and the world changes with it: historical borders, old maps la
 - **Borders for every era.** Empires and countries redraw themselves for the year you're on, back to 123,000 BC. Click any region for who ruled it and a Wikipedia summary.
 - **What happened, day by day.** Every year from AD 1000 on gets a calendar heat-map. Pick a day to see its events ranked by impact, pinned on the globe. Earlier eras show the year, century or millennium.
 - **Thinkers and art.** Switch on layers for the philosophers alive at the time (about 95, from Confucius and the Buddha to Arendt and Fanon) and for public-domain artworks from the period, shown where they were made.
-- **Ask the guide.** "Ask about this moment" opens a chat with Claude that knows the year, the place and what's on screen. It answers like a museum guide and can move the globe to show you what it's describing. Use Claude or ChatGPT with your own API key, or free models through OpenRouter or Pollinations (no key at all). Keys stay in your browser.
+- **Ask the guide.** "Ask about this moment" opens a chat with Claude that knows the year, the place and what's on screen. It answers like a museum guide and can move the globe to show you what it's describing. It starts on a free model through Pollinations, with no key needed; you can switch to Claude or ChatGPT with your own API key, or to free models through OpenRouter. Keys stay in your browser. Places Wikipedia doesn't cover get a short AI-written description, labelled as such.
 - **Old maps in their own time.** Ordnance Survey London in the 1890s, the Cassini map of France, Swiss maps edition by edition, post-war Tokyo from the air and more fade in on the globe when the timeline reaches their years.
 - **Deep time.** Before people, the globe shows the continents where they actually sat, back a billion years. Before that it's an ocean world, then a molten young Earth, then nothing at all.
 - **Seventeen guided journeys.** From the Big Bang to you, the Axial Age, the Silk Road, the age of exploration, Renaissance art, the Second World War, the space race, the great extinctions, Ice Age humans and more.
+- **The story of philosophy and the story of art.** Two illustrated companion pages ([`philosophy.html`](philosophy.html) and [`art.html`](art.html)) walk through 17 eras each, from the Upanishads to today and from Ice Age caves to today. Each era has a grand picture, an introduction, its thinkers and big questions or its famous works, and topics to explore, with a link that opens the era on the globe.
 - **Side-by-side compare.** A second view ([`compare.html`](compare.html)) lays old maps over modern ones with fade, swipe and spyglass modes, and accepts any [Allmaps](https://allmaps.org) or XYZ tile link.
 
 ![Thinkers and artworks around Europe in 1505](docs/screenshot-layers.jpg)
@@ -72,6 +73,8 @@ It needs Xcode's command line tools. The app reads its pages straight from the f
 ```
 index.html            the time machine
 compare.html          the side-by-side old-map viewer
+philosophy.html       the story of philosophy, era by era
+art.html              the story of art, era by era
 css/app.css           the "Field line" design: tokens first, then components
 js/core.js            shared basics (loaded first)
 js/data/milestones.js landmarks on the grand timeline, from the Big Bang on
@@ -84,6 +87,7 @@ js/finetune.js        typing a moment, and the zoom ruler
 js/guide.js           the AI guide (Claude via the official Anthropic SDK; ChatGPT, OpenRouter and Pollinations via their chat APIs)
 js/search.js          search: moments, things in Palimpsest, and anything on Wikipedia
 js/tutorial.js        the first-run guided tour
+js/eras.js            the Philosophy and Art pages (eras in js/data/philosophy-eras.js and art-eras.js)
 app/macos/            the native Mac wrapper (Swift, no Xcode project needed)
 ```
 
@@ -103,7 +107,7 @@ Everything is loaded live from its source and shown with attribution on the map.
 - **Imagery and place names:** Esri World Imagery and World Boundaries and Places.
 - **Terrain:** [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) on AWS Open Data, originally from Mapzen.
 - **Old maps:** [National Library of Scotland](https://maps.nls.uk), [swisstopo](https://www.swisstopo.admin.ch), [IGN France](https://www.geoportail.gouv.fr), [IGN España](https://www.ign.es), [GSI Japan](https://maps.gsi.go.jp), and maps from Digital Commonwealth, the Nationaal Archief, Yale Library and MSU Libraries, warped by [Allmaps](https://allmaps.org).
-- **Art:** the [Cleveland Museum of Art Open Access](https://www.clevelandart.org/open-access) collection (CC0).
+- **Art:** the [Cleveland Museum of Art Open Access](https://www.clevelandart.org/open-access) collection (CC0). Era pictures on the Philosophy and Art pages are the lead images of Wikipedia articles, from Wikimedia Commons.
 - **AI guide:** [Claude](https://www.anthropic.com/claude) by Anthropic or ChatGPT by OpenAI (your own API key), or free models via [OpenRouter](https://openrouter.ai) and [Pollinations](https://pollinations.ai).
 - **Fonts:** Inter Tight, Cormorant Garamond and IBM Plex Mono from Google Fonts (SIL Open Font License).
 - **Libraries:** MapLibre GL JS (BSD-3-Clause), Leaflet (BSD-2-Clause) and the Anthropic TypeScript SDK (MIT).

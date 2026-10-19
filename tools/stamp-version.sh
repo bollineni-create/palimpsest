@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 V="$(date +%Y%m%d%H%M)"
-for page in index.html compare.html; do
+for page in index.html compare.html philosophy.html art.html; do
   perl -pi -e 's#((?:src|href)="(?:js|css)/[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"#$1?v='"$V"'"#g' "$page"
 done
 echo "Stamped version $V"
