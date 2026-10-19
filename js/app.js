@@ -693,6 +693,9 @@ async function parseYearArticle(title) {
     if (parentLi) { const c = parentLi.cloneNode(true); c.querySelectorAll("ul, ol").forEach(n => n.remove()); date = c.textContent.replace(/\s+/g, " ").replace(/[\s–—:-]+$/, "").trim(); }
     const m = text.match(/^(.{2,40}?)\s[–—]\s(.+)$/);
     if (m && !/[.!?]/.test(m[1])) { date = date ? `${date}, ${m[1]}` : m[1]; text = m[2]; }
+    // Overviews start lines with the year: "1274 BCE: …", "c. 1300–1046 BC: …", "440s BC: …"
+    const y = !m && text.match(/^((?:c\.\s*|ca\.\s*|circa\s*)?\d{1,4}s?(?:\s*[–-]\s*\d{1,4}s?)?\s*(?:BC|BCE|AD|CE)?)\s*:\s+(.+)$/i);
+    if (y) { date = date ? `${date}, ${y[1]}` : y[1]; text = y[2].charAt(0).toUpperCase() + y[2].slice(1); }
     const links = [...el.querySelectorAll('a[href^="/wiki/"]')]
       .map(a => decodeURIComponent(a.getAttribute("href").slice(6)).split("#")[0].replace(/_/g, " "))
       .filter(t => !t.includes(":") && !DATE_LINK.test(t));
@@ -937,8 +940,26 @@ function updateDayReadout() {
 }
 
 let activeEv = null;
+// The year an event belongs to: the article's own year, or (in century and millennium overviews) the year in its date or heading
+function eventYear(e, data) {
+  if (data.exact && data.year != null) return data.year;
+  const m = `${e.date || ""} ${e.group || ""}`.match(/\b(\d{1,4})s?\s*(BC|BCE)?\b/i);
+  if (!m) return null;
+  const n = +m[1];
+  return m[2] ? -n : (/\bBC\b/i.test(data.title) ? -n : n);
+}
 function openEvent(data, i) {
   const e = data.events[i];
+  // Take the timeline to the event's own moment: its year, and its day when the date is known
+  const y = eventYear(e, data);
+  if (y != null && y !== state.year && y >= BIG_BANG && y <= TODAY) {
+    if (e.m && e.d) state.pendingDay = `${e.m}-${e.d}`;
+    setYear(y, { exact: true });
+  } else if (data.exact && e.m && e.d && !(state.day && state.day.m === e.m && state.day.d === e.d) && state.history === data) {
+    state.day = { m: e.m, d: e.d };
+    updateDayReadout();
+    renderHistory();
+  }
   if (activeEv != null) map.setFeatureState({ source: "events", id: activeEv }, { active: false });
   document.querySelectorAll(".ev.active").forEach(n => n.classList.remove("active"));
   const btn = document.querySelector(`.ev[data-i="${i}"]`); if (btn) { btn.classList.add("active"); btn.scrollIntoView({ block: "nearest" }); }
@@ -950,7 +971,8 @@ function openEvent(data, i) {
     const specific = e.page && e.page === e.subject;          // the event's own article has coordinates: a battle, a building, a city
     map.flyTo({ center: e.at, zoom: Math.max(map.getZoom(), specific ? 6.5 : 4.5), pitch: 0, duration: 2500, essential: true });
   }
-  const when = e.m && e.d ? `${dayLabel(data.year, e.m, e.d)} ${fmtLabel(data.year)}` : (e.date ? `${e.date} · ${fmtLabel(data.year)}` : fmtLabel(data.year));
+  const ey = y != null ? y : data.year;
+  const when = ey == null ? (e.date || data.title) : e.m && e.d ? `${dayLabel(ey, e.m, e.d)} ${fmtLabel(ey)}` : (e.date && !/\d{3,4}/.test(e.date) ? `${e.date} · ${fmtLabel(ey)}` : fmtLabel(ey));
   // Explain it with the event's own subject (its most important linked article), not just the place it's pinned to
   const topic = e.subject || e.page || e.links[0];
   $("pYear").textContent = when;
