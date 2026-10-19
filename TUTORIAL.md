@@ -96,6 +96,8 @@ The switches at the top of the panel turn layers on and off: **Events**, **Think
 
 - **The strip at the top** is a timeline of the eras. Click one to jump there; it follows you as you scroll.
 - **Each era** fills the window with its picture. Scroll down and the story rises over it: an introduction, then the big questions and thinkers of the age (philosophy) or a gallery of famous works (art).
+- **Click a big question** (philosophy) for a guide to it: the branch of philosophy it belongs to, what's at stake, how different thinkers and schools answered it, and where the debate stands now. Click any thinker in it to read about them, and **← Back** to return.
+- **Key concepts** (philosophy) explains the era's central ideas, such as the Forms, the dichotomy of control or the veil of ignorance, in plain language. Click a concept's name for the full article.
 - **The fuller picture** follows: what shaped the era, its breakthrough ideas or new techniques, the world around it, and what it led to.
 - **Click any thinker, work or topic** to read the whole article without leaving Palimpsest. Links inside it open the next article, and **← Back** returns.
 - **Zoom into any picture.** Click the era's picture, or any picture in an article, to open the viewer. Scroll or pinch to zoom, drag to move, double-click to zoom in, and **Fit** to see it whole. It loads a high-resolution version, so you can get close to the brushwork.

@@ -86,6 +86,14 @@ function depthHtml(e) {
     <div class="card"><h4>The world around it</h4><p>${esc(d.world)}</p><h4>What it led to</h4><p>${esc(d.legacy)}</p></div>
   </div>`;
 }
+// Key concepts of a philosophy era, and the guide to each of its big questions
+const questionOf = (e, i) => typeof PHILOSOPHY_QUESTIONS !== "undefined" && PHILOSOPHY_QUESTIONS[e.id] ? PHILOSOPHY_QUESTIONS[e.id][i] : null;
+function conceptsHtml(e) {
+  const list = typeof PHILOSOPHY_CONCEPTS !== "undefined" && SUBJECT === "philosophy" ? PHILOSOPHY_CONCEPTS[e.id] : null;
+  if (!list) return "";
+  return `<div class="concepts"><h4>Key concepts</h4><div class="concept-grid">${list.map(c => `
+    <div class="concept"><button type="button" data-topic="${esc(c.w)}">${esc(c.term)} <span aria-hidden="true">→</span></button><p>${esc(c.text)}</p></div>`).join("")}</div></div>`;
+}
 function renderEras() {
   const main = $("eras");
   main.innerHTML = `<header class="lede"><div class="tag">${COPY.tag}</div><h1>${COPY.h1}</h1><p>${esc(COPY.p)}</p></header>`;
@@ -95,7 +103,7 @@ function renderEras() {
     const people = SUBJECT === "philosophy" ? thinkersOf(e) : [];
     const left = SUBJECT === "philosophy"
       ? `<p class="intro">${esc(e.intro)}</p>
-         <h4>The big questions</h4><ul class="questions">${e.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul>`
+         <h4>The big questions</h4><ul class="questions">${e.questions.map((q, qi) => `<li><button type="button" data-question="${qi}"><span>${esc(q)}</span>${questionOf(e, qi) ? `<small>${esc(questionOf(e, qi).branch)} · ${questionOf(e, qi).answers.length} answers →</small>` : ""}</button></li>`).join("")}</ul>`
       : `<p class="intro">${esc(e.intro)}</p>`;
     const right = SUBJECT === "philosophy"
       ? (people.length ? `<h4>Thinkers of the age</h4><ul class="people">${people.map(t => `<li><button type="button" data-thinker="${esc(t.n)}"><b>${esc(t.n)} <em>${esc(t.s)}</em></b><small>${esc(lifeSpan(t))}</small><i>${esc(t.i)}</i></button></li>`).join("")}</ul>` : "")
@@ -108,6 +116,7 @@ function renderEras() {
       <div class="era-body ${SUBJECT}">
         <div class="col">${left}</div>
         <div class="col">${right}</div>
+        ${conceptsHtml(e)}
         ${depthHtml(e)}
         <div class="explore">
           <h4>Topics to explore</h4><div class="topics">${e.topics.map(t => `<button type="button" data-topic="${esc(t)}">${esc(t.replace(/ \((?:philosophy|Chinese philosophy|Plato|Augustine|Montaigne|book|Spinoza|Hobbes book)\)$/, ""))}</button>`).join("")}</div>
@@ -115,7 +124,7 @@ function renderEras() {
         </div>
       </div>`;
     s.dataset.index = i;
-    s.querySelectorAll(".era-body .col > *, .era-body .depth .card, .era-body .explore").forEach(el => { el.classList.add("reveal"); revealObserver.observe(el); });
+    s.querySelectorAll(".era-body .col > *, .era-body .concepts, .era-body .depth .card, .era-body .explore").forEach(el => { el.classList.add("reveal"); revealObserver.observe(el); });
     main.appendChild(s);
   });
 }
@@ -296,12 +305,17 @@ async function articleHtml(title) {
 let readReq = 0, lastButton = null, readerStack = [];
 function setGlobe(year, at) { $("rGlobe").href = globeHref(year, at); $("rGlobe").textContent = `See ${fmtYear(Math.round(year))} on the globe →`; }
 async function openReader(entry, { push = false } = {}) {
+  if (entry.kind === "question") {     // carry the era's moment and place, for links opened from the question
+    const era = ERAS.find(x => x.id === entry.era);
+    entry = { ...entry, title: era.questions[entry.i], tag: era.title, year: midYear(era), at: era.at };
+  }
   if (push && $("reader").dataset.current) readerStack.push(JSON.parse($("reader").dataset.current));
   if (!push) readerStack = readerStack.length && entry.fromBack ? readerStack : [];
   $("reader").dataset.current = JSON.stringify({ ...entry, fromBack: undefined });
   $("rBack").hidden = !readerStack.length;
   const { title, tag, sub, year, at } = entry;
   const id = ++readReq;
+  if (entry.kind === "question") { renderQuestion(entry); return; }
   $("reader").hidden = false; $("reader").scrollTop = 0;
   $("rTag").textContent = tag || "";
   $("rTitle").textContent = title;
@@ -333,6 +347,26 @@ async function openReader(entry, { push = false } = {}) {
   if (id !== readReq) return;
   $("rArticle").innerHTML = html || "";
 }
+// A big question: its branch, what's at stake, how thinkers answered and where the debate stands
+function renderQuestion({ era: eraId, i }) {
+  const era = ERAS.find(x => x.id === eraId), q = questionOf(era, i);
+  $("reader").hidden = false; $("reader").scrollTop = 0;
+  $("rTag").textContent = `${q ? q.branch : "Question"} · ${era.title}`;
+  $("rTitle").textContent = era.questions[i];
+  $("rSub").hidden = true; $("rPic").hidden = true;
+  setGlobe(midYear(era), era.at);
+  $("rLink").href = WIKI + "/wiki/" + encodeURIComponent(((q && q.bw) || "Philosophy").replace(/ /g, "_"));
+  if (!q) { $("rText").textContent = "A question people argued about in this era."; $("rArticle").innerHTML = ""; return; }
+  $("rText").textContent = q.frame;
+  const others = era.questions.map((t, j) => j === i ? "" : `<button type="button" data-question-jump="${j}">${esc(t)}</button>`).join("");
+  $("rArticle").innerHTML = `
+    <h2>How they answered</h2>
+    <div class="answers">${q.answers.map(a => `
+      <div class="answer"><div class="who"><a data-wiki="${esc(a.w)}">${esc(a.who)}</a><span class="school">${esc(a.school)}</span></div><p>${esc(a.says)}</p></div>`).join("")}</div>
+    <h2>Where the debate stands</h2><p>${esc(q.today)}</p>
+    <h2>Go deeper</h2><p>This is a question of ${esc(q.branch.toLowerCase())}. <a data-wiki="${esc(q.bw)}">Read about ${esc(q.bw)} →</a> Or click any thinker above for their life and ideas.</p>
+    ${others ? `<h2>More questions from this era</h2><div class="more-q">${others}</div>` : ""}`;
+}
 function closeReader() { $("reader").hidden = true; delete $("reader").dataset.current; readerStack = []; if (lastButton) lastButton.classList.remove("on"); lastButton = null; }
 $("closeReader").addEventListener("click", closeReader);
 $("rBack").addEventListener("click", () => { const prev = readerStack.pop(); if (prev) openReader({ ...prev, fromBack: true }); });
@@ -340,6 +374,8 @@ $("rPic").addEventListener("click", () => openViewer($("rImg").src, $("rPic").da
 $("reader").addEventListener("click", e => {
   const img = e.target.closest("img.zoomable");
   if (img) { const cap = img.closest("figure") && img.closest("figure").querySelector("figcaption"); openViewer(img.src, cap ? cap.textContent.trim() : img.alt, img.dataset.full); return; }
+  const jump = e.target.closest("button[data-question-jump]");
+  if (jump) { const cur = JSON.parse($("reader").dataset.current || "{}"); openReader({ kind: "question", era: cur.era, i: +jump.dataset.questionJump, title: "" }, { push: true }); return; }
   const a = e.target.closest("a[data-wiki]");
   if (a) {
     e.preventDefault();
@@ -356,6 +392,14 @@ $("eras").addEventListener("click", ev => {
   if (hero && !ev.target.closest("button")) {
     const img = hero.querySelector("img");
     if (img.src) openViewer(img.src, hero.querySelector("figcaption button").textContent, largeImage(img.src, 0).replace(/\/\d+px-/, "/3840px-"));
+    return;
+  }
+  const qb = ev.target.closest("button[data-question]");
+  if (qb) {
+    const era = ERAS[+qb.closest(".era").dataset.index];
+    if (lastButton) lastButton.classList.remove("on");
+    lastButton = qb; qb.classList.add("on");
+    openReader({ kind: "question", era: era.id, i: +qb.dataset.question, title: era.questions[+qb.dataset.question] });
     return;
   }
   const b = ev.target.closest("button[data-topic], button[data-thinker], button[data-work]");

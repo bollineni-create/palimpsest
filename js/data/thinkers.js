@@ -24,7 +24,7 @@ const THINKERS = [
   { n: "Zhuangzi", b: -369, d: -286, at: [115.65, 34.41], s: "Taoism", i: "Was I a man dreaming I was a butterfly, or a butterfly dreaming I am a man?", w: "Zhuang Zhou" },
   { n: "Epicurus", b: -341, d: -270, at: [23.72, 37.98], s: "Epicureanism", i: "Seek calm pleasures and freedom from fear.", w: "Epicurus" },
   { n: "Zeno of Citium", b: -334, d: -262, at: [23.7225, 37.976], s: "Stoicism", i: "Live in agreement with nature and reason.", w: "Zeno of Citium" },
-  { n: "Xunzi", b: -310, d: -235, at: [118.05, 34.86], s: "Confucianism", i: "Goodness is learned through effort and ritual, not inborn.", w: "Xunzi" },
+  { n: "Xunzi", b: -310, d: -235, at: [118.05, 34.86], s: "Confucianism", i: "Goodness is learned through effort and ritual, not inborn.", w: "Xunzi (philosopher)" },
   { n: "Han Fei", b: -280, d: -233, at: [113.73, 34.39], s: "Legalism", i: "Order comes from clear laws, firm rewards and punishments.", w: "Han Fei" },
   { n: "Cicero", b: -106, d: -43, at: [12.4853, 41.8925], s: "Roman philosophy", i: "A natural law of reason binds all people.", w: "Cicero" },
   { n: "Lucretius", b: -99, d: -55, at: [12.48, 41.9], s: "Epicureanism", i: "Nothing comes from nothing, and death is nothing to us.", w: "Lucretius" },

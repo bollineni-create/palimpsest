@@ -22,7 +22,7 @@ Drag the timeline and the world changes with it: historical borders, old maps la
 - **Old maps in their own time.** Ordnance Survey London in the 1890s, the Cassini map of France, Swiss maps edition by edition, post-war Tokyo from the air and more fade in on the globe when the timeline reaches their years.
 - **Deep time.** Before people, the globe shows the continents where they actually sat, back a billion years. Before that it's an ocean world, then a molten young Earth, then nothing at all.
 - **Seventeen guided journeys.** From the Big Bang to you, the Axial Age, the Silk Road, the age of exploration, Renaissance art, the Second World War, the space race, the great extinctions, Ice Age humans and more.
-- **The story of philosophy and the story of art.** Two illustrated companion pages ([`philosophy.html`](philosophy.html) and [`art.html`](art.html)) walk through 17 eras each, from the Upanishads to today and from Ice Age caves to today. Each era opens with a full-window picture; scroll down and its story rises over it: an introduction, its thinkers and big questions or its famous works, what shaped it, its breakthroughs, the world around it and what it led to, and topics to explore. Every topic opens the full article inside the app, with links you can follow, and every picture opens in a viewer you can zoom and pan.
+- **The story of philosophy and the story of art.** Two illustrated companion pages ([`philosophy.html`](philosophy.html) and [`art.html`](art.html)) walk through 17 eras each, from the Upanishads to today and from Ice Age caves to today. Each era opens with a full-window picture; scroll down and its story rises over it: an introduction, its thinkers and big questions or its famous works, its key concepts explained (philosophy), what shaped it, its breakthroughs, the world around it and what it led to, and topics to explore. Each big question opens a guide to it: the branch of philosophy it belongs to, what's at stake, how three or four thinkers and schools answered it, and where the debate stands today. Every topic opens the full article inside the app, with links you can follow, and every picture opens in a viewer you can zoom and pan.
 - **Side-by-side compare.** A second view ([`compare.html`](compare.html)) lays old maps over modern ones with fade, swipe and spyglass modes, and accepts any [Allmaps](https://allmaps.org) or XYZ tile link.
 
 ![Thinkers and artworks around Europe in 1505](docs/screenshot-layers.jpg)
@@ -87,7 +87,7 @@ js/finetune.js        typing a moment, and the zoom ruler
 js/guide.js           the AI guide (Claude via the official Anthropic SDK; ChatGPT, OpenRouter and Pollinations via their chat APIs)
 js/search.js          search: moments, things in Palimpsest, and anything on Wikipedia
 js/tutorial.js        the first-run guided tour
-js/eras.js            the Philosophy and Art pages (eras in js/data/philosophy-eras.js and art-eras.js)
+js/eras.js            the Philosophy and Art pages (eras in js/data/philosophy-eras.js and art-eras.js; concepts and question guides in js/data/philosophy-concepts.js)
 app/macos/            the native Mac wrapper (Swift, no Xcode project needed)
 ```
 
