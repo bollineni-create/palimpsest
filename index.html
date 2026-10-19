@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Palimpsest</title>
+<meta name="description" content="A journey through time on a 3D globe: from the Big Bang to today, with historical borders, old maps and what happened each day.">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.css">
+<link rel="stylesheet" href="css/app.css">
+
+</head>
+<body>
+<div id="map" aria-label="Globe"></div>
+<div id="tint" aria-hidden="true"></div>
+
+<div class="readout" aria-live="polite">
+  <div class="day" id="day" hidden></div>
+  <div class="yr" id="yr">1900</div>
+  <div class="era" id="era">Industrial age</div>
+  <div class="src tag" id="src">Borders as of 1900</div>
+  <div class="period" id="period"></div>
+</div>
+
+<aside class="drawer glass" id="drawer">
+  <header>
+    <div class="brand"><h1>Palim<i>psest</i></h1><button class="x" id="closeDrawer" aria-label="Hide panel" title="Hide (Esc)">×</button></div>
+    <span class="tag">Field notes along the line of time</span>
+  </header>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="history">History</button>
+    <button role="tab" aria-selected="false" data-tab="maps">Old maps</button>
+    <button role="tab" aria-selected="false" data-tab="tours">Journeys</button>
+  </div>
+  <div class="scroll" id="tab-history"></div>
+  <div class="scroll" id="tab-maps" hidden></div>
+  <div class="scroll" id="tab-tours" hidden></div>
+  <div class="foot">
+    <a href="compare.html" id="compareLink">Side-by-side compare →</a>
+    <span class="tag" title="← → years · [ ] days · space plays · T tilts">Keys: ← → [ ] space</span>
+  </div>
+</aside>
+<button class="open-drawer glass" id="openDrawer">☰ Maps &amp; journeys</button>
+
+<div class="place glass" id="place" hidden>
+  <button class="x" id="closePlace" aria-label="Close">×</button>
+  <div class="tag" id="pYear"></div>
+  <h3 id="pName"></h3>
+  <p id="pSub"></p>
+  <img id="pImg" alt="" hidden>
+  <p id="pExtract" class="extract" hidden></p>
+  <a id="pLink" href="#" target="_blank" rel="noopener">Read more on Wikipedia ↗</a>
+</div>
+
+<div class="caption glass" id="caption" hidden>
+  <div class="tag" id="capTitle"></div>
+  <div class="step" id="capText"></div>
+  <div class="row">
+    <span class="tag" id="capCount"></span>
+    <span style="display:flex;gap:6px">
+      <button class="pill" id="capPrev">◂ Back</button>
+      <button class="pill" id="capNext">Next ▸</button>
+      <button class="pill" id="capStop">End journey</button>
+    </span>
+  </div>
+</div>
+
+<section class="timeline glass" aria-label="Timeline">
+  <div class="tl-row">
+    <button class="play" id="play" aria-label="Play through time" title="Play (space)">▶</button>
+    <div class="track">
+      <div class="rail"></div>
+      <div class="density" id="density" aria-hidden="true"></div>
+      <div class="bands" id="bands" aria-hidden="true"></div>
+      <input id="time" type="range" min="0" max="10000" value="0" aria-label="Year">
+      <div class="head" id="head"></div>
+      <div class="marks" id="marks" aria-label="Landmarks"></div>
+    </div>
+  </div>
+  <div class="ticks" id="ticks" aria-hidden="true"></div>
+  <div class="tl-controls">
+    <div class="nudge" aria-label="Step years">
+      <button data-step="-100">−100</button><button data-step="-10">−10</button><button data-step="-1">−1</button>
+      <button data-step="1">+1</button><button data-step="10">+10</button><button data-step="100">+100</button>
+      <button id="todayBtn" class="today">Today</button>
+    </div>
+    <div class="opt"><span class="tag">Now</span><input id="blend" type="range" min="0" max="100" value="85" aria-label="Blend between today and the past"><span class="tag">Then</span></div>
+    <div class="speed"><span class="tag">Speed</span><input id="speed" type="range" min="1" max="10" value="4" aria-label="Playback speed"></div>
+    <button class="pill" id="labelsBtn" aria-pressed="false">Place names</button>
+    <button class="pill" id="tiltBtn" aria-pressed="false">3D tilt</button>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.js"></script>
+<script src="js/core.js"></script>
+<script src="js/data/milestones.js"></script>
+<script src="js/data/maps.js"></script>
+<script src="js/data/tours.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
