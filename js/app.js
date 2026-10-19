@@ -195,7 +195,7 @@ const isActive = (m, y) => y >= m.from && y <= m.to && y < TODAY;
 /* ---------- Apply a year to everything ---------- */
 function renderYearText(f) { $("yr").innerHTML = f.n + (f.s ? `<small>${f.s}</small>` : ""); }
 let swissTimer = 0;
-function setYear(y, { fromSlider = false, exact = false } = {}) {
+function setYear(y, { fromSlider = false, exact = false, fromFine = false } = {}) {
   y = exact ? Math.max(BIG_BANG, Math.min(TODAY, Math.round(y) || 1)) : snapYear(y);
   if (y !== state.year) { state.day = null; updateDayReadout(); }
   state.year = y;
@@ -208,6 +208,7 @@ function setYear(y, { fromSlider = false, exact = false } = {}) {
   if (!fromSlider) $("time").value = Math.round(pos * 10000);
   $("head").style.left = (pos * 100) + "%";
   $("time").setAttribute("aria-valuetext", f.n + (f.s ? " " + f.s : ""));
+  yearHooks.forEach(h => h(y, { fromSlider, fromFine }));
   if (!state.ready) return;
 
   const today = y >= TODAY;
@@ -424,6 +425,7 @@ function showStep() {
   $("capPrev").disabled = state.tourStep === 0;
   $("capNext").textContent = state.tourStep === t.steps.length - 1 ? "Finish" : "Next ▸";
   if (s.day) state.pendingDay = s.day;
+  if (s.layers && typeof setLayers === "function") setLayers(s.layers);
   setYear(s.year, { exact: true });
   map.flyTo({ center: s.center, zoom: s.zoom, pitch: s.pitch || 0, bearing: s.bearing || 0, duration: 4000, essential: true });
 }
@@ -532,6 +534,7 @@ map.on("click", "b-fill", e => {
   $("pName").textContent = p.NAME;
   const ruler = p.SUBJECTO && p.SUBJECTO !== p.NAME ? `Ruled by or part of ${p.SUBJECTO}.` : (p.PARTOF && p.PARTOF !== p.NAME ? `Part of ${p.PARTOF}.` : "Independent in this era.");
   $("pSub").textContent = ruler;
+  state.selected = { kind: "region", name: p.NAME, text: ruler };
   $("pLink").href = "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(p.NAME);
   $("place").hidden = false;
   fillSummary(p.NAME, true);
@@ -593,15 +596,28 @@ async function fetchHistory(title) {
   const sec = await wikiApi({ action: "parse", page: title, prop: "sections", redirects: 1 });
   if (sec.error) return null;
   const ev = sec.parse.sections.find(x => /^events/i.test(x.line));
-  if (!ev) return null;
-  const res = await wikiApi({ action: "parse", page: title, section: ev.index, prop: "text", redirects: 1, disableeditsection: 1, disablelimitreport: 1 });
+  // Most year articles keep events under an "Events" heading; some (like 1453) list them by region straight away, up to "Births"
+  const END = /^(births|deaths|references|see also|notes|further reading|external links)/i;
+  const wholePage = !ev;
+  if (wholePage && (!sec.parse.sections.length || END.test(sec.parse.sections[0].line))) return null;
+  const res = await wikiApi(wholePage
+    ? { action: "parse", page: title, prop: "text", redirects: 1, disableeditsection: 1, disablelimitreport: 1 }
+    : { action: "parse", page: title, section: ev.index, prop: "text", redirects: 1, disableeditsection: 1, disablelimitreport: 1 });
   if (res.error) return null;
   const doc = new DOMParser().parseFromString(res.parse.text, "text/html");
   doc.querySelectorAll("sup, .mw-ref, style, .reflist, .gallery, table, .thumb, figure, .hatnote, .shortdescription").forEach(n => n.remove());
   const items = [];
-  let group = "";
-  doc.querySelectorAll("h2, h3, h4, h5, li").forEach(el => {
-    if (/^H\d$/.test(el.tagName)) { group = el.textContent.trim(); if (/^events$/i.test(group)) group = ""; return; }
+  let group = "", started = !wholePage, stopped = false;
+  // Prose-style articles (like 1453) tell their events in paragraphs rather than bullets, so read those too
+  doc.querySelectorAll(wholePage ? "h2, h3, h4, h5, li, p" : "h2, h3, h4, h5, li").forEach(el => {
+    if (stopped) return;
+    if (/^H\d$/.test(el.tagName)) {
+      group = el.textContent.trim();
+      if (wholePage && el.tagName === "H2") { if (END.test(group)) { stopped = true; return; } started = true; }
+      if (/^(events|global events)$/i.test(group)) group = "";
+      return;
+    }
+    if (!started) return;
     if (el.querySelector("ul, ol")) return;                   // a parent bullet: its text becomes the date of its children
     let text = el.textContent.replace(/\s+/g, " ").trim();
     if (text.length < 12) return;
@@ -614,7 +630,9 @@ async function fetchHistory(title) {
       .map(a => decodeURIComponent(a.getAttribute("href").slice(6)).split("#")[0].replace(/_/g, " "))
       .filter(t => !t.includes(":") && !DATE_LINK.test(t));
     if (date.length > 40) date = "";
-    items.push({ group, date, text, links: [...new Set(links)].slice(0, 5), ...parseDay(date, group) });
+    // In prose paragraphs the date sits inside the sentence ("On June 14, …")
+    const when = date || (el.tagName === "P" ? (text.match(new RegExp(`\\b(?:${MONTH}) \\d{1,2}\\b|\\b\\d{1,2} (?:${MONTH})\\b`)) || [""])[0] : "");
+    items.push({ group, date: date || when, text, links: [...new Set(links)].slice(0, 5), ...parseDay(when, group) });
   });
   const events = items.slice(0, 600);
   const yr = /^\d{1,4}$/.test(res.parse.title) ? +res.parse.title : (res.parse.title.match(/^AD (\d+)$/) || [])[1] ? +res.parse.title.slice(3) : (res.parse.title.match(/^(\d+) BC$/) || [])[1] ? -res.parse.title.match(/^(\d+) BC$/)[1] : null;
@@ -695,7 +713,7 @@ async function showHistory(y) {
   state.history = null; state.deepMilestones = null;
   el.innerHTML = `<div class="hist-head"><span class="tag">History</span><h3>${fmtLabel(y)}</h3><span class="ctx">Looking up what happened…</span></div>`;
   setPins([]);
-  if (y >= TODAY) { el.querySelector(".ctx").textContent = "Drag the timeline back to see what happened at any moment, from the Big Bang to yesterday."; renderMilestoneList(el, nearbyMilestones(y)); return; }
+  if (y >= TODAY) { el.querySelector(".ctx").textContent = "Drag the timeline back to see what happened at any moment, from the Big Bang to yesterday."; renderMilestoneList(el, nearbyMilestones(y)); panelHooks.forEach(h => h(el)); return; }
   const titles = historyTitles(y);
   if (!titles.length) { await showDeepHistory(y, id); return; }
   let data = null;
@@ -783,6 +801,7 @@ function renderHistory() {
     const month = data.events.map((e, i) => [e, i]).filter(([e]) => e.m === m && !e.d);
     if (month.length) { const h2 = document.createElement("h2"); h2.textContent = `Also in ${MONTHS[m - 1]}, day unknown`; el.appendChild(h2); month.forEach(([e, i]) => el.appendChild(eventRow(e, i))); }
     setPins(onDay.filter(([e]) => e.at).map(([e, i]) => pinFeature(e, i)));
+    panelHooks.forEach(h => h(el));
   } else {
     const top = rankDiverse(data.events.map((e, i) => [e, i])).slice(0, 10);
     const h = document.createElement("h2"); h.textContent = uiText("top", l => `Most impactful of ${l}`)(fmtLabel(y)); el.appendChild(h);
@@ -802,6 +821,7 @@ function renderHistory() {
       });
     }
     setPins(data.events.map((e, i) => e.at && pinFeature(e, i)).filter(Boolean));
+    panelHooks.forEach(h => h(el));
   }
 }
 // Rank by impact, but let each subject (a person, a war) lead only once before others get a turn
@@ -863,6 +883,7 @@ function openEvent(data, i) {
   $("pSub").innerHTML = "";
   const t = document.createElement("span"); t.className = "event-text"; t.textContent = e.text; $("pSub").appendChild(t);
   $("place").hidden = false;
+  state.selected = { kind: "event", name: e.page || e.links[0] || "Event", text: `${when}: ${e.text}` };
   const topic = e.page || e.links[0];
   if (topic) fillSummary(topic, false); else { $("pImg").hidden = true; $("pExtract").hidden = true; $("pLink").href = wikiUrl(data.title); }
 }
@@ -914,6 +935,7 @@ async function showDeepHistory(y, id) {
   renderMilestoneList(el, list);
   state.deepMilestones = list;
   pinMilestones(list);
+  panelHooks.forEach(h => h(el));
 }
 async function openMilestone(ms) {
   stopPlay();
@@ -924,6 +946,7 @@ async function openMilestone(ms) {
   $("pSub").innerHTML = "";
   const t = document.createElement("span"); t.className = "event-text"; t.textContent = ms.d; $("pSub").appendChild(t);
   $("place").hidden = false;
+  state.selected = { kind: "landmark", name: ms.t, text: `${msDate(ms)}: ${ms.d}` };
   fillSummary(ms.w, true);
   if (ms.at) {
     let at = ms.at;
@@ -964,6 +987,7 @@ async function fillSummary(title, search) {
   $("pExtract").textContent = s.extract;
   if (s.thumbnail && s.thumbnail.source) { $("pImg").src = s.thumbnail.source; $("pImg").hidden = false; }
   $("pLink").href = (s.content_urls && s.content_urls.desktop.page) || wikiUrl(s.title);
+  $("pLink").textContent = "Read more on Wikipedia ↗";
 }
 
 /* ---------- Remember where you were (survives reloads and live updates) ---------- */
@@ -981,7 +1005,7 @@ function savedView() { try { return JSON.parse(localStorage.getItem("palimpsest:
 $("closeDrawer").addEventListener("click", () => $("drawer").classList.add("closed"));
 $("openDrawer").addEventListener("click", () => $("drawer").classList.remove("closed"));
 document.addEventListener("keydown", e => {
-  if (e.target.matches("input[type=text], input[type=search]")) return;
+  if (e.target.matches("input:not([type=range]), textarea, select")) return;
   if (e.key === " " && !e.target.matches("button")) { e.preventDefault(); state.playing ? stopPlay() : startPlay(); }
   if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.target.matches("input")) {
     e.preventDefault(); stopPlay();
@@ -1009,6 +1033,8 @@ map.on("load", () => { state.ready = true; setYear(state.year, { exact: true });
 function placeOverlays() {
   const h = document.querySelector(".timeline").offsetHeight + 28;
   $("caption").style.bottom = h + "px";
+  const guide = document.getElementById("guide");
+  if (guide && innerWidth >= 760) guide.style.bottom = h + "px";
   $("drawer").style.bottom = (innerWidth < 760 ? "auto" : h + "px");
   document.querySelectorAll(".maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right").forEach(el => el.style.bottom = (h - 14) + "px");
 }

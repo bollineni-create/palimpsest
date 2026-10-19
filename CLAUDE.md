@@ -1,7 +1,10 @@
 # Palimpsest: notes for working on this project
 
 - Static site, no build step: `index.html` (time machine), `compare.html` (old-map compare), `css/app.css`, `js/*.js`.
-  Scripts are plain globals loaded in order: `core.js`, `data/milestones.js`, `data/maps.js`, `data/tours.js`, `app.js`.
+  Scripts are plain globals loaded in order: `core.js`, `data/milestones.js`, `data/maps.js`, `data/tours.js`, `data/thinkers.js`, `app.js`,
+  then `layers.js`, `finetune.js`, `guide.js`, which plug in through `yearHooks` / `panelHooks` (defined in `core.js`).
+- The guide (`js/guide.js`) calls Claude from the browser with the official Anthropic SDK (pinned on jsDelivr) and the user's own key
+  in localStorage; model `claude-opus-5-5`, effort `low`, server-side refusal fallback on. Keep the conversation append-only.
 - Preview locally with `python3 -m http.server 8643` from the repo root.
 - The installed Mac app (`/Applications/Palimpsest.app`) reads these files live from the folder it was built in and reloads
   within a second of any change to `.html/.js/.css/.json`, so page changes need no rebuild. Only changes in `app/macos/`

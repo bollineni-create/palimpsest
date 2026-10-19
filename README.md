@@ -10,13 +10,20 @@ Drag the timeline and the world changes with it: historical borders, old maps la
 ## What it does
 
 - **A timeline of everything.** One line runs from the Big Bang 13.8 billion years ago to today, painted in the official geologic time-scale colours, with about 90 landmark moments as stations along it. Press play and watch history run.
+- **Fine-tune the moment.** Click the year and type any moment: "1453", "323 BC", "66 million years ago" or "20 July 1969". A zoom ruler under the timeline scrubs a chosen span, from 10 years to a billion.
 - **Explore like a globe.** Spin, zoom and tilt into 3D terrain. Satellite imagery is softened like a watercolour, and fades towards sepia the further back you go.
 - **Borders for every era.** Empires and countries redraw themselves for the year you're on, back to 123,000 BC. Click any region for who ruled it and a Wikipedia summary.
 - **What happened, day by day.** Every year from AD 1000 on gets a calendar heat-map. Pick a day to see its events ranked by impact, pinned on the globe. Earlier eras show the year, century or millennium.
+- **Thinkers and art.** Switch on layers for the philosophers alive at the time (about 95, from Confucius and the Buddha to Arendt and Fanon) and for public-domain artworks from the period, shown where they were made.
+- **Ask the guide.** "Ask about this moment" opens a chat with Claude that knows the year, the place and what's on screen. It answers like a museum guide and can move the globe to show you what it's describing. It uses your own Anthropic API key, which stays in your browser.
 - **Old maps in their own time.** Ordnance Survey London in the 1890s, the Cassini map of France, Swiss maps edition by edition, post-war Tokyo from the air and more fade in on the globe when the timeline reaches their years.
 - **Deep time.** Before people, the globe shows the continents where they actually sat, back a billion years. Before that it's an ocean world, then a molten young Earth, then nothing at all.
-- **Guided journeys.** "From the Big Bang to you", "Paris through three centuries", "Zürich grows up", "London before and after the Blitz", "Tokyo rebuilt" and "Empires rise and fall".
+- **Seventeen guided journeys.** From the Big Bang to you, the Axial Age, the Silk Road, the age of exploration, Renaissance art, the Second World War, the space race, the great extinctions, Ice Age humans and more.
 - **Side-by-side compare.** A second view ([`compare.html`](compare.html)) lays old maps over modern ones with fade, swipe and spyglass modes, and accepts any [Allmaps](https://allmaps.org) or XYZ tile link.
+
+![Thinkers and artworks around Europe in 1505](docs/screenshot-layers.jpg)
+
+![The guide, with the thinkers alive in 1972](docs/screenshot-guide.jpg)
 
 ![The continents 66 million years ago](docs/screenshot-deep-time.jpg)
 
@@ -41,6 +48,7 @@ Then open <http://localhost:8000>. GitHub Pages works too: publish the repositor
 | `Space` | Play or pause |
 | `T` | Tilt to 3D |
 | `Esc` | Show or hide the panel |
+| Click the year | Type a year or a date |
 
 ## The Mac app
 
@@ -63,11 +71,17 @@ js/core.js            shared basics (loaded first)
 js/data/milestones.js landmarks on the grand timeline, from the Big Bang on
 js/data/maps.js       georeferenced historical maps and the years they cover
 js/data/tours.js      guided journeys
+js/data/thinkers.js   philosophers from every tradition, with where and when they worked
 js/app.js             globe, timeline, deep time, history and impact ranking
+js/layers.js          the thinker and art layers
+js/finetune.js        typing a moment, and the zoom ruler
+js/guide.js           the AI guide (Claude, via the official Anthropic SDK)
 app/macos/            the native Mac wrapper (Swift, no Xcode project needed)
 ```
 
 Plain scripts, no framework and no bundler. [MapLibre GL JS](https://maplibre.org) draws the globe, and [Leaflet](https://leafletjs.com) draws the compare view.
+
+**The guide.** It runs entirely in the browser: the page loads the official [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) and talks to Claude Opus 5.5 directly, with your own API key saved in `localStorage`. There's no server in between. Each question carries a short description of where you are (the moment, the map view and what's on screen), and Claude has two tools: `go_to_moment`, which moves the timeline and globe, and `set_layers`. Server-side refusal fallback is switched on, so if a safeguard declines a request, the API retries it on a suitable fallback model. Questions are billed to your Anthropic account.
 
 **How "impact" is ranked.** Wikipedia's year articles list events without any ranking. Palimpsest scores each event by its subject: how long and how widely translated that Wikipedia article is, read from Wikidata. Wikipedia's one-line description adds a boost for specific events from that very year ("First crewed Moon landing (1969)"). People, countries and broad topics, which are linked from everything, are damped, and each subject leads the top list only once. It's a heuristic, and it gets some years wrong.
 
@@ -81,10 +95,12 @@ Everything is loaded live from its source and shown with attribution on the map.
 - **Imagery and place names:** Esri World Imagery and World Boundaries and Places.
 - **Terrain:** [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) on AWS Open Data, originally from Mapzen.
 - **Old maps:** [National Library of Scotland](https://maps.nls.uk), [swisstopo](https://www.swisstopo.admin.ch), [IGN France](https://www.geoportail.gouv.fr), [IGN España](https://www.ign.es), [GSI Japan](https://maps.gsi.go.jp), and maps from Digital Commonwealth, the Nationaal Archief, Yale Library and MSU Libraries, warped by [Allmaps](https://allmaps.org).
+- **Art:** the [Cleveland Museum of Art Open Access](https://www.clevelandart.org/open-access) collection (CC0).
+- **AI guide:** [Claude](https://www.anthropic.com/claude) by Anthropic, using your own API key.
 - **Fonts:** Inter Tight, Cormorant Garamond and IBM Plex Mono from Google Fonts (SIL Open Font License).
-- **Libraries:** MapLibre GL JS (BSD-3-Clause) and Leaflet (BSD-2-Clause).
+- **Libraries:** MapLibre GL JS (BSD-3-Clause), Leaflet (BSD-2-Clause) and the Anthropic TypeScript SDK (MIT).
 
-The landmark texts in `js/data/milestones.js` were written for this project. Deep-time dates are the commonly cited estimates, and many carry wide uncertainty.
+The landmark texts in `js/data/milestones.js` and the thinker summaries in `js/data/thinkers.js` were written for this project. Deep-time dates are the commonly cited estimates, and many carry wide uncertainty.
 
 ## Licence
 

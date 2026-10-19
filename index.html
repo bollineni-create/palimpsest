@@ -19,7 +19,7 @@
 
 <div class="readout" aria-live="polite">
   <div class="day" id="day" hidden></div>
-  <div class="yr" id="yr">1900</div>
+  <div class="yr" id="yr" role="button" tabindex="0" title="Click to type a year or a date">1900</div>
   <div class="era" id="era">Industrial age</div>
   <div class="src tag" id="src">Borders as of 1900</div>
   <div class="period" id="period"></div>
@@ -30,6 +30,7 @@
     <div class="brand"><h1>Palim<i>psest</i></h1><button class="x" id="closeDrawer" aria-label="Hide panel" title="Hide (Esc)">×</button></div>
     <span class="tag">Field notes along the line of time</span>
   </header>
+  <div class="layer-chips" id="layerChips" aria-label="Layers"></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="history">History</button>
     <button role="tab" aria-selected="false" data-tab="maps">Old maps</button>
@@ -52,8 +53,39 @@
   <p id="pSub"></p>
   <img id="pImg" alt="" hidden>
   <p id="pExtract" class="extract" hidden></p>
-  <a id="pLink" href="#" target="_blank" rel="noopener">Read more on Wikipedia ↗</a>
+  <div class="place-foot">
+    <a id="pLink" href="#" target="_blank" rel="noopener">Read more on Wikipedia ↗</a>
+    <button type="button" class="ask-mini" id="pAsk">✦ Ask the guide</button>
+  </div>
 </div>
+
+<aside class="guide glass" id="guide" hidden aria-label="Guide">
+  <header>
+    <div class="g-title"><span class="spark">✦</span><div><h2>Guide</h2><span class="tag" id="guideMoment"></span></div></div>
+    <div class="g-tools">
+      <button type="button" class="g-icon" id="guideNew" title="New conversation">New</button>
+      <button type="button" class="g-icon" id="guideSettings" title="API key">Key</button>
+      <button type="button" class="x" id="closeGuide" aria-label="Close guide">×</button>
+    </div>
+  </header>
+  <div class="g-key" id="guideKey" hidden>
+    <p>To talk with the guide, add your own <strong>Anthropic API key</strong>. It's stored only in this browser (or this Mac app) and is sent only to Anthropic. Questions are billed to your Anthropic account.</p>
+    <form id="guideKeyForm">
+      <input id="guideKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Anthropic API key">
+      <button type="submit" class="pill">Save key</button>
+    </form>
+    <p class="g-small"><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get a key from the Anthropic Console ↗</a> · <button type="button" class="link" id="guideKeyRemove">Remove saved key</button></p>
+    <p class="g-small bad" id="guideKeyMsg" aria-live="polite"></p>
+  </div>
+  <div class="g-log" id="guideLog" aria-live="polite"></div>
+  <div class="g-starters" id="guideStarters"></div>
+  <form class="g-form" id="guideForm">
+    <textarea id="guideInput" rows="2" placeholder="Ask about this moment…" aria-label="Your question"></textarea>
+    <button type="submit" class="g-send" id="guideSend" aria-label="Send">↑</button>
+    <button type="button" class="g-send stop" id="guideStop" aria-label="Stop" hidden>■</button>
+  </form>
+  <p class="g-small g-model">Claude Opus 5.5 · answers can be wrong, so check what matters</p>
+</aside>
 
 <div class="caption glass" id="caption" hidden>
   <div class="tag" id="capTitle"></div>
@@ -81,6 +113,17 @@
     </div>
   </div>
   <div class="ticks" id="ticks" aria-hidden="true"></div>
+  <div class="fine-row">
+    <span class="tag">Zoom</span>
+    <button type="button" class="fz" id="fineOut" aria-label="Show a wider span of time">−</button>
+    <div class="fine-track">
+      <div class="fine-ticks" id="fineTicks" aria-hidden="true"></div>
+      <input id="fine" type="range" min="0" max="1000" value="500" aria-label="Fine-tune the year">
+      <div class="fine-head" id="fineHead"></div>
+    </div>
+    <button type="button" class="fz" id="fineIn" aria-label="Show a narrower span of time">+</button>
+    <button type="button" class="fine-span" id="fineAuto" title="Reset to the automatic span"><span id="fineSpan">100 years</span></button>
+  </div>
   <div class="tl-controls">
     <div class="nudge" aria-label="Step years">
       <button data-step="-100">−100</button><button data-step="-10">−10</button><button data-step="-1">−1</button>
@@ -91,6 +134,7 @@
     <div class="speed"><span class="tag">Speed</span><input id="speed" type="range" min="1" max="10" value="4" aria-label="Playback speed"></div>
     <button class="pill" id="labelsBtn" aria-pressed="false">Place names</button>
     <button class="pill" id="tiltBtn" aria-pressed="false">3D tilt</button>
+    <button class="pill ask" id="askBtn">✦ Ask about this moment</button>
   </div>
 </section>
 
@@ -99,6 +143,10 @@
 <script src="js/data/milestones.js"></script>
 <script src="js/data/maps.js"></script>
 <script src="js/data/tours.js"></script>
+<script src="js/data/thinkers.js"></script>
 <script src="js/app.js"></script>
+<script src="js/layers.js"></script>
+<script src="js/finetune.js"></script>
+<script src="js/guide.js"></script>
 </body>
 </html>
