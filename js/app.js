@@ -625,11 +625,14 @@ function loadHistory(title) {
   }
   return histCache.get(title);
 }
+const loadedHistories = new Map();       // every year article read this session, so search can look through them
 async function fetchHistory(title) {
   const parsed = await parseYearArticle(title);
   if (!parsed) return null;
   await enrichEvents(parsed.items, parsed.year);
-  return { title: parsed.title, events: parsed.items };
+  const data = { title: parsed.title, events: parsed.items, year: parsed.year };
+  loadedHistories.set(parsed.title, data);
+  return data;
 }
 // Lines that are page furniture, not events: footnotes, citations, statistics rows, bare numbers
 const NOT_AN_EVENT = [
