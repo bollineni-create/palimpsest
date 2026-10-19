@@ -90,10 +90,9 @@ const style = {
     paleo: { type: "geojson", data: { type: "FeatureCollection", features: [] }, attribution: "Ancient continents: " + A("https://gwsdoc.gplates.org/", "GPlates") + " (Merdith et al. 2021)" },
     events: { type: "geojson", data: { type: "FeatureCollection", features: [] }, attribution: "History: " + A("https://en.wikipedia.org/", "Wikipedia") },
   },
-  terrain: { source: "dem", exaggeration: 1.4 },
   layers: [
     { id: "space", type: "background", paint: { "background-color": "#a9c9cf" } },
-    { id: "imagery", type: "raster", source: "imagery", paint: { "raster-fade-duration": 150 } },
+    { id: "imagery", type: "raster", source: "imagery", paint: { "raster-fade-duration": 0 } },
     { id: "paper", type: "fill", source: "paper", paint: { "fill-color": "#6b4e24", "fill-opacity": 0 } },
     { id: "paleo-land", type: "fill", source: "paleo", paint: { "fill-color": "#a08d5e", "fill-outline-color": "#a08d5e", "fill-opacity": 1, "fill-antialias": false } },
   ],
@@ -128,10 +127,11 @@ style.layers.push(
 const map = new maplibregl.Map({
   container: "map", style, center: [12, 38], zoom: 1.7, maxPitch: 80,
   attributionControl: { compact: true }, hash: false,
+  maxTileCacheSize: 800,       // keep more tiles while panning, so areas don't reload and blink
+  fadeDuration: 150,           // labels settle faster after a move
 });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 map.addControl(new maplibregl.GlobeControl(), "top-right");
-map.addControl(new maplibregl.TerrainControl({ source: "dem", exaggeration: 1.4 }), "top-right");
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 
 /* ---------- State ---------- */
@@ -343,7 +343,7 @@ function applyDeep(y) {
   if (deep !== state.deep) {
     state.deep = deep;
     setBaseLayers();
-    try { map.setTerrain(deep ? null : { source: "dem", exaggeration: 1.4 }); } catch {}
+    updateTerrain();
   }
   let bg = THEME.ocean, note = "";
   if (y < -4.54e9) { bg = THEME.sky[0]; note = y < -4.568e9 ? "No Sun and no Earth yet · this is where Earth will be" : "The Sun is shining · Earth is still dust and rock"; }
@@ -529,7 +529,16 @@ function toggleTilt() {
   map.easeTo({ pitch: tilted ? 0 : 60, duration: 1200 });
   $("tiltBtn").setAttribute("aria-pressed", String(!tilted));
 }
-map.on("pitchend", () => $("tiltBtn").setAttribute("aria-pressed", String(map.getPitch() > 10)));
+map.on("pitchend", () => { $("tiltBtn").setAttribute("aria-pressed", String(map.getPitch() > 10)); updateTerrain(); });
+map.on("pitchstart", () => { if (!state.deep) updateTerrain(true); });
+// 3D terrain only while the globe is tilted: in a flat, top-down view it adds nothing but redraw flicker
+let terrainOn = false;
+function updateTerrain(tilting) {
+  const want = !state.deep && (tilting || map.getPitch() > 5);
+  if (want === terrainOn) return;
+  terrainOn = want;
+  try { map.setTerrain(want ? { source: "dem", exaggeration: 1.4 } : null); } catch {}
+}
 
 /* ---------- Playback ---------- */
 let raf = 0, last = 0;
@@ -553,13 +562,22 @@ $("play").addEventListener("click", () => state.playing ? stopPlay() : startPlay
 
 /* ---------- Exploring: hover and click on historical regions ---------- */
 const pop = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "hover-pop", offset: 10 });
+// Re-filtering a layer makes MapLibre redraw it, so only do it when the hovered region actually changes, and not while dragging
+let hovered = "";
+function setHovered(name) {
+  if (name === hovered) return;
+  hovered = name;
+  map.setFilter("b-hover", ["==", ["get", "NAME"], name]);
+}
 map.on("mousemove", "b-fill", e => {
+  if (map.isMoving()) return;
   const f = e.features && e.features[0]; if (!f) return;
   map.getCanvas().style.cursor = "pointer";
-  map.setFilter("b-hover", ["==", ["get", "NAME"], f.properties.NAME]);
+  setHovered(f.properties.NAME);
   pop.setLngLat(e.lngLat).setText(f.properties.NAME).addTo(map);
 });
-map.on("mouseleave", "b-fill", () => { map.getCanvas().style.cursor = ""; map.setFilter("b-hover", ["==", ["get", "NAME"], ""]); pop.remove(); });
+map.on("mouseleave", "b-fill", () => { map.getCanvas().style.cursor = ""; setHovered(""); pop.remove(); });
+map.on("movestart", () => { pop.remove(); });
 map.on("click", "b-fill", e => {
   const f = e.features && e.features[0]; if (!f) return;
   const p = f.properties, by = state.borderYear;
@@ -1167,7 +1185,7 @@ if (restored && typeof restored.year === "number") {
   map.jumpTo({ center: restored.center, zoom: restored.zoom, pitch: restored.pitch, bearing: restored.bearing });
   setYear(restored.year, { exact: true });
 } else setYear(1900);
-map.on("load", () => { state.ready = true; setYear(state.year, { exact: true }); resumeTour(); });
+map.on("load", () => { state.ready = true; setYear(state.year, { exact: true }); updateTerrain(); resumeTour(); });
 function placeOverlays() {
   const h = document.querySelector(".timeline").offsetHeight + 28;
   $("caption").style.bottom = h + "px";
