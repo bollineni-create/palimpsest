@@ -6,6 +6,7 @@
 <title>Palimpsest Compare</title>
 <meta name="description" content="Compare old maps with today's world by fading, swiping or looking through a spyglass.">
 <link rel="icon" type="image/png" href="assets/icon.png">
+<script>try { const t = localStorage.getItem("palimpsest:theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -28,6 +29,10 @@
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #e6ebe4; --ink-soft: #9ba79f; --paper: #1b221e; --paper-2: #121815; --line: rgba(230,235,228,.14);
+    --accent: #ef6c4b; --accent-ink: #ffffff; --water: #8fc2ab; --shadow: 0 10px 30px rgba(0,0,0,.45); color-scheme: dark; } }
+:root[data-theme="dark"] { --ink: #e6ebe4; --ink-soft: #9ba79f; --paper: #1b221e; --paper-2: #121815; --line: rgba(230,235,228,.14);
+    --accent: #ef6c4b; --accent-ink: #ffffff; --water: #8fc2ab; --shadow: 0 10px 30px rgba(0,0,0,.45); color-scheme: dark; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }

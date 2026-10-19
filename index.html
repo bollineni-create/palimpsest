@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.css">
 <link rel="stylesheet" href="css/app.css">
+<script>try { const t = localStorage.getItem("palimpsest:theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 
 </head>
 <body>
@@ -27,7 +28,7 @@
 
 <aside class="drawer glass" id="drawer">
   <header>
-    <div class="brand"><h1>Palim<i>psest</i></h1><button class="x" id="closeDrawer" aria-label="Hide panel" title="Hide (Esc)">×</button></div>
+    <div class="brand"><h1>Palim<i>psest</i></h1><div class="brand-tools"><button type="button" class="theme-btn" id="themeBtn" title="Appearance"></button><button class="x" id="closeDrawer" aria-label="Hide panel" title="Hide (Esc)">×</button></div></div>
     <span class="tag">Field notes along the line of time</span>
   </header>
   <div class="layer-chips" id="layerChips" aria-label="Layers"></div>

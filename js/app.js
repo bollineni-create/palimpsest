@@ -259,13 +259,24 @@ function updateMarks() {
 
 
 /* ---------- The design: a painted globe, and a transit line coloured by geologic time ---------- */
-const THEME = {
+const THEME_LIGHT = {
   lift: 0.36, sat: -0.3, bright: 1, contrast: -0.12, fill: 1.7, blur: 1.4,       // imagery softened like a watercolour wash
   palette: ["#9fc7b6", "#e6b77e", "#c98ea6", "#a7b8d8", "#d9c27a", "#b7a3cf", "#b9d39b", "#e9a890"],
   border: "#6b5a48", label: "#22302a", halo: "rgba(251,250,246,.85)",
   pin: "#ffffff", stroke: "#22302a", old: "#d4492a",                                // event pins are drawn as transit stations
   land: "#d8c79f", ocean: "#a9c9cf", sky: ["#eeebe3", "#d6e2df", "#e2e6e0"],
+  thinker: "#5f8f7d", thinkerLabel: "#3e6b5b", tint: "paper",
 };
+// Field line at night: the imagery dimmed, empires in deeper washes, light ink on a dark sky
+const THEME_DARK = {
+  lift: 0.0, sat: -0.3, bright: 0.72, contrast: 0.08, fill: 1.45, blur: 1.4,
+  palette: ["#4f8a76", "#b0864a", "#9c5f78", "#6579aa", "#a99447", "#7e6ba5", "#7a9c5c", "#b4705c"],
+  border: "#d6c4a2", label: "#eef1ec", halo: "rgba(14,19,16,.88)",
+  pin: "#f2f4ef", stroke: "#121815", old: "#ef6c4b",
+  land: "#8c7c57", ocean: "#11313d", sky: ["#0a1119", "#243a48", "#18252d"],
+  thinker: "#8fc2ab", thinkerLabel: "#bfe3d1", tint: "night",
+};
+let THEME = isDark() ? THEME_DARK : THEME_LIGHT;
 const PAPER = `url("data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><filter id="p"><feTurbulence type="fractalNoise" baseFrequency=".012 .02" numOctaves="4" seed="7"/><feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 0 0.3  0 0 0 .28 0"/></filter><rect width="100%" height="100%" filter="url(#p)"/></svg>')}")`;
 // Official geologic time scale colours (International Commission on Stratigraphy), oldest first
 const PERIODS = [
@@ -286,8 +297,23 @@ function buildRail() {
 const TEXT = { top: y => `Main stops of ${y}`, day: "Stops on this day" };
 const uiText = (k, fallback) => TEXT[k] || fallback;
 function setBaseLayers() { map.setLayoutProperty("imagery", "visibility", state.deep ? "none" : "visible"); }
+const TINTS = {
+  paper: () => ({ background: `${PAPER}, radial-gradient(ellipse at center, transparent 55%, rgba(120,100,70,.18))`, mixBlendMode: "multiply" }),
+  night: () => ({ background: "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.38))", mixBlendMode: "normal" }),
+};
+// Switch between the light and dark designs: page colours (via data-theme), the map, and anything else that listens
+function setAppearance() {
+  const mode = themeMode();
+  if (mode === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = mode;
+  THEME = isDark() ? THEME_DARK : THEME_LIGHT;
+  const tint = $("tint"); tint.removeAttribute("style"); Object.assign(tint.style, TINTS[THEME.tint]());
+  if (state.ready) { applyTheme(); setYear(state.year, { exact: true }); }
+  themeHooks.forEach(h => h(isDark()));
+}
 function applyTheme() {
   const t = THEME;
+  map.setSky({ "sky-color": t.sky[0], "horizon-color": t.sky[1], "fog-color": t.sky[2], "sky-horizon-blend": 0.5, "horizon-fog-blend": 0.6, "fog-ground-blend": 0.5,
+    "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] });
   map.setPaintProperty("b-fill", "fill-color", ["to-color", ["at", ["%", ["get", "h"], t.palette.length], ["literal", t.palette]]]);
   map.setPaintProperty("b-line", "line-color", t.border);
   map.setPaintProperty("b-line", "line-blur", t.blur);
@@ -303,7 +329,7 @@ function applyTheme() {
   map.setPaintProperty("old-dot-label", "text-halo-color", t.halo);
   map.setPaintProperty("paleo-land", "fill-color", t.land);
   map.setPaintProperty("paleo-land", "fill-outline-color", t.land);
-  map.setPaintProperty("paper", "fill-color", "#8a7a5a");
+  map.setPaintProperty("paper", "fill-color", isDark() ? "#3a3020" : "#8a7a5a");
 }
 
 /* ---------- Deep time: no imagery, drifting continents, a molten or absent Earth ---------- */
@@ -876,16 +902,28 @@ function openEvent(data, i) {
   if (activeEv != null) map.setFeatureState({ source: "events", id: activeEv }, { active: false });
   document.querySelectorAll(".ev.active").forEach(n => n.classList.remove("active"));
   const btn = document.querySelector(`.ev[data-i="${i}"]`); if (btn) { btn.classList.add("active"); btn.scrollIntoView({ block: "nearest" }); }
-  if (e.at) { activeEv = i; map.setFeatureState({ source: "events", id: i }, { active: true }); stopPlay(); map.flyTo({ center: e.at, zoom: Math.max(map.getZoom(), 5), duration: 2500, essential: true }); }
+  stopPlay();
+  // Go to where it happened. A pin on a specific place (a battle, a city) earns a closer look than one on a whole country.
+  if (e.at) {
+    activeEv = i;
+    map.setFeatureState({ source: "events", id: i }, { active: true });
+    const specific = e.page && e.page === e.subject;          // the event's own article has coordinates: a battle, a building, a city
+    map.flyTo({ center: e.at, zoom: Math.max(map.getZoom(), specific ? 6.5 : 4.5), pitch: 0, duration: 2500, essential: true });
+  }
   const when = e.m && e.d ? `${dayLabel(data.year, e.m, e.d)} ${fmtLabel(data.year)}` : (e.date ? `${e.date} · ${fmtLabel(data.year)}` : fmtLabel(data.year));
+  // Explain it with the event's own subject (its most important linked article), not just the place it's pinned to
+  const topic = e.subject || e.page || e.links[0];
   $("pYear").textContent = when;
-  $("pName").textContent = e.page || e.links[0] || "Event";
+  $("pName").textContent = topic || "Event";
   $("pSub").innerHTML = "";
   const t = document.createElement("span"); t.className = "event-text"; t.textContent = e.text; $("pSub").appendChild(t);
+  const where = document.createElement("span"); where.className = "where";
+  where.textContent = e.at ? `📍 ${e.page || "On the map"}` : "No location on the map for this event";
+  $("pSub").appendChild(where);
   $("place").hidden = false;
-  state.selected = { kind: "event", name: e.page || e.links[0] || "Event", text: `${when}: ${e.text}` };
-  const topic = e.page || e.links[0];
-  if (topic) fillSummary(topic, false); else { $("pImg").hidden = true; $("pExtract").hidden = true; $("pLink").href = wikiUrl(data.title); }
+  state.selected = { kind: "event", name: topic || "Event", text: `${when}: ${e.text}${e.page ? ` (located at ${e.page})` : ""}` };
+  if (topic) fillSummary(topic, false, [...new Set([topic, ...e.links])]);
+  else { $("pImg").hidden = true; $("pExtract").hidden = true; $("pLink").href = wikiUrl(data.title); }
 }
 
 /* ---------- The grand timeline: landmarks across all of time ---------- */
@@ -978,14 +1016,36 @@ async function summary(title, search = false) {
   return s;
 }
 let sumReq = 0;
-async function fillSummary(title, search) {
+// The first of these articles that has a lead picture, so an event shows a relevant image even when its subject has none
+const picCache = new Map();
+async function firstPicture(titles) {
+  const key = titles.join("|");
+  if (!picCache.has(key)) picCache.set(key, wikiApi({ action: "query", prop: "pageimages", piprop: "thumbnail", pithumbsize: 640, titles: titles.slice(0, 20).join("|"), redirects: 1 })
+    .then(r => {
+      if (!r.query) return null;
+      const alias = new Map();
+      (r.query.normalized || []).forEach(n => alias.set(n.from, n.to));
+      (r.query.redirects || []).forEach(n => alias.set(n.from, n.to));
+      const byTitle = new Map((r.query.pages || []).map(p => [p.title, p]));
+      for (const t of titles) { let k = t, hops = 0; while (alias.has(k) && hops++ < 3) k = alias.get(k); const p = byTitle.get(k); if (p && p.thumbnail) return { src: p.thumbnail.source, from: p.title }; }
+      return null;
+    }).catch(() => null));
+  return picCache.get(key);
+}
+async function fillSummary(title, search, pictureFrom) {
   const id = ++sumReq;
   $("pImg").hidden = true; $("pExtract").hidden = false; $("pExtract").textContent = "Loading…";
   const s = await summary(title, search).catch(() => null);
   if (id !== sumReq) return;
-  if (!s) { $("pExtract").hidden = true; return; }
-  $("pExtract").textContent = s.extract;
-  if (s.thumbnail && s.thumbnail.source) { $("pImg").src = s.thumbnail.source; $("pImg").hidden = false; }
+  if (!s) { $("pExtract").hidden = true; }
+  else $("pExtract").textContent = s.extract;
+  if (s && s.thumbnail && s.thumbnail.source) { $("pImg").src = (s.originalimage && s.originalimage.width <= 1200 ? s.originalimage.source : s.thumbnail.source); $("pImg").alt = s.title; $("pImg").hidden = false; }
+  else if (pictureFrom && pictureFrom.length) {
+    const pic = await firstPicture(pictureFrom);
+    if (id !== sumReq) return;
+    if (pic) { $("pImg").src = pic.src; $("pImg").alt = pic.from; $("pImg").hidden = false; }
+  }
+  if (!s) return;
   $("pLink").href = (s.content_urls && s.content_urls.desktop.page) || wikiUrl(s.title);
   $("pLink").textContent = "Read more on Wikipedia ↗";
 }
@@ -1020,7 +1080,20 @@ document.addEventListener("keydown", e => {
 
 /* ---------- Boot ---------- */
 buildRail();
-Object.assign($("tint").style, { background: `${PAPER}, radial-gradient(ellipse at center, transparent 55%, rgba(120,100,70,.18))`, mixBlendMode: "multiply" });
+setAppearance();
+darkQuery.addEventListener("change", () => { if (themeMode() === "auto") setAppearance(); });
+const THEME_LABELS = { auto: ["◐", "Auto"], light: ["☀", "Light"], dark: ["☾", "Dark"] };
+function renderThemeBtn() {
+  const [icon, name] = THEME_LABELS[themeMode()];
+  $("themeBtn").innerHTML = `<b aria-hidden="true">${icon}</b>${name}`;
+  $("themeBtn").setAttribute("aria-label", `Appearance: ${name}. Click to change.`);
+}
+$("themeBtn").addEventListener("click", () => {
+  const order = ["auto", "light", "dark"], next = order[(order.indexOf(themeMode()) + 1) % 3];
+  try { localStorage.setItem(THEME_KEY, next); } catch {}
+  renderThemeBtn(); setAppearance();
+});
+renderThemeBtn();
 map.on("load", applyTheme);
 buildTicks();
 renderTours();

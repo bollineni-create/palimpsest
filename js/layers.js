@@ -226,9 +226,18 @@ function initLayers() {
   map.on("mouseenter", "th-dot", () => map.getCanvas().style.cursor = "pointer");
   map.on("mouseleave", "th-dot", () => map.getCanvas().style.cursor = "");
   applyLayerVisibility();
+  themeThinkers();
   updateThinkers();
   scheduleArt(true);
 }
+function themeThinkers() {
+  if (!state.ready || !map.getLayer("th-dot")) return;
+  map.setPaintProperty("th-dot", "circle-color", THEME.thinker);
+  map.setPaintProperty("th-dot", "circle-stroke-color", THEME.stroke === "#121815" ? "#121815" : "#fbfaf6");
+  map.setPaintProperty("th-label", "text-color", THEME.thinkerLabel);
+  map.setPaintProperty("th-label", "text-halo-color", THEME.halo);
+}
+themeHooks.push(themeThinkers);
 yearHooks.push(() => { updateThinkers(); scheduleArt(); });
 panelHooks.push(el => renderLayerSections(el));
 renderLayerChips();
