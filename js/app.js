@@ -541,6 +541,14 @@ document.querySelectorAll(".nudge [data-step]").forEach(b => b.addEventListener(
 $("blend").addEventListener("input", e => { state.blend = e.target.value / 100; applyLook(); });
 $("labelsBtn").addEventListener("click", e => { state.labels = !state.labels; e.currentTarget.setAttribute("aria-pressed", String(state.labels)); setYear(state.year, { exact: true }); });
 $("tiltBtn").addEventListener("click", toggleTilt);
+// Phones show only the timeline until More is pressed (the button is hidden on wider screens)
+function setTimelineMore(on) {
+  document.querySelector(".timeline").classList.toggle("expanded", on);
+  $("tlMore").setAttribute("aria-expanded", String(on));
+  $("tlMore").textContent = on ? "Fewer controls" : "More controls";
+  requestAnimationFrame(() => { layoutTicks(); placeOverlays(); if (on && typeof updateFine === "function") updateFine(); });
+}
+$("tlMore").addEventListener("click", () => setTimelineMore(!document.querySelector(".timeline").classList.contains("expanded")));
 $("todayBtn").addEventListener("click", () => { stopPlay(); setYear(TODAY, { exact: true }); });
 function toggleTilt() {
   const tilted = map.getPitch() > 10;
