@@ -224,8 +224,25 @@ button, input { font: inherit; color: inherit; }
   .drawer { bottom: auto; max-height: 45vh; }
   .readout .yr { font-size: 38px; }
   .place { top: auto; bottom: 200px; right: 14px; width: calc(100vw - 28px); }
-  .tl-controls, .ticks { margin-left: 0; }
+  .tl-controls { margin-left: 0; }
+  .timeline { left: 8px; right: 8px; padding: 8px 10px 10px; gap: 6px; }
+  .tl-row { gap: 10px; }
+  .track { min-width: 0; }
+  .ticks { margin-left: 48px; }
+  .ticks span:last-child { transform: translateX(-85%); }
+  /* Phones: just the timeline, Ask and More until More is pressed */
+  .timeline:not(.expanded) .fine-row, .timeline:not(.expanded) .tl-controls > :not(#askBtn):not(#tlMore) { display: none; }
+  .timeline:not(.expanded) .tl-controls { justify-content: space-between; }
+  .timeline.expanded .ask-long { display: none; }
+  .timeline.expanded { background: var(--panel-solid); }
+  .tl-controls { gap: 8px 12px; }
+  .nudge { display: flex; width: 100%; }
+  .nudge button { flex: 1; padding: 7px 0; }
+  .opt, .speed { flex: 1 1 40%; }
+  .opt input[type=range], .speed input { width: auto; flex: 1; min-width: 0; }
 }
+#tlMore { display: none; }
+@media (max-width: 760px) { #tlMore { display: inline-block; } }
 @media (prefers-reduced-motion: reduce) { .drawer { transition: none; } }
 
 /* ---------- Typing a moment ---------- */

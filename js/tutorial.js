@@ -27,6 +27,7 @@ function startTutorial() {
   $("drawer").classList.remove("closed");
   $("place").hidden = true;
   const guide = document.getElementById("guide"); if (guide) guide.hidden = true;
+  setTimelineMore(true);   // the tour points at the fine-tune ruler
   tutStep = 0;
   $("tutorial").hidden = false;
   showTutorialStep();
@@ -34,7 +35,7 @@ function startTutorial() {
 function endTutorial() {
   tutStep = -1;
   $("tutorial").hidden = true;
-  if (innerWidth < 760) $("drawer").classList.add("closed");   // the tour opened the panel; on a phone, give the globe back
+  if (innerWidth < 760) { $("drawer").classList.add("closed"); setTimelineMore(false); }   // the tour opened the panels; on a phone, give the globe back
   try { localStorage.setItem(TUTORIAL_KEY, "1"); } catch {}
 }
 function showTutorialStep() {
