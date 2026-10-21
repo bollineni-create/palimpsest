@@ -34,6 +34,7 @@ function startTutorial() {
 function endTutorial() {
   tutStep = -1;
   $("tutorial").hidden = true;
+  if (innerWidth < 760) $("drawer").classList.add("closed");   // the tour opened the panel; on a phone, give the globe back
   try { localStorage.setItem(TUTORIAL_KEY, "1"); } catch {}
 }
 function showTutorialStep() {
