@@ -96,7 +96,9 @@ function updateFine() {
   input.setAttribute("aria-valuetext", fmtLabel(y));
   const ticks = $("fineTicks");
   ticks.innerHTML = "";
-  const step = niceStep(sp / 7);
+  // about one label per 70px, so labels never run into each other on a narrow screen
+  const fit = Math.max(2, Math.min(7, Math.floor((ticks.clientWidth || 490) / 70)));
+  const step = niceStep(sp / fit);
   for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) {
     const s = document.createElement("span");
     s.style.left = ((t - lo) / (hi - lo) * 100) + "%";
@@ -127,4 +129,5 @@ $("fineIn").addEventListener("click", () => zoomFine(-1));
 $("fineOut").addEventListener("click", () => zoomFine(1));
 $("fineAuto").addEventListener("click", () => { fineSpan = null; updateFine(); });
 yearHooks.push((y, opts) => { if (!fineDragging && !opts.fromFine) updateFine(); });
+addEventListener("resize", () => { if (!fineDragging) updateFine(); });
 updateFine();

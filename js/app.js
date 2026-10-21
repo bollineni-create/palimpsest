@@ -124,12 +124,17 @@ style.layers.push(
     paint: { "text-color": "#d6b26e", "text-halo-color": "#0b0805", "text-halo-width": 1.5 } },
 );
 
-const map = new maplibregl.Map({
-  container: "map", style, center: [12, 38], zoom: 1.7, maxPitch: 80,
-  attributionControl: { compact: true }, hash: false,
-  maxTileCacheSize: 800,       // keep more tiles while panning, so areas don't reload and blink
-  fadeDuration: 150,           // labels settle faster after a move
-});
+// Without WebGL (or if MapLibre didn't load) there is no globe to build, so show the explanation instead
+const map = (() => {
+  try {
+    return new maplibregl.Map({
+      container: "map", style, center: [12, 38], zoom: 1.7, maxPitch: 80,
+      attributionControl: { compact: true }, hash: false,
+      maxTileCacheSize: 800,       // keep more tiles while panning, so areas don't reload and blink
+      fadeDuration: 150,           // labels settle faster after a move
+    });
+  } catch (err) { showNoGlobe(); throw err; }
+})();
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 map.addControl(new maplibregl.GlobeControl(), "top-right");
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
@@ -172,12 +177,21 @@ async function showBorders(by) {
     if (id !== borderReq) return;
     map.getSource("borders").setData(fc);
     updateSourceLine();
+    followRegionCard(fc, by);
     // warm the neighbours so scrubbing feels instant
     const i = BORDER_YEARS.indexOf(by);
     [BORDER_YEARS[i - 1], BORDER_YEARS[i + 1]].forEach(n => n != null && loadBorders(n).catch(() => {}));
   } catch {
     if (id === borderReq) $("src").textContent = "Couldn't load borders for this era. Check your connection.";
   }
+}
+// An open region card describes one border snapshot; when the borders change, update it or close it
+function followRegionCard(fc, by) {
+  const sel = state.selected;
+  if (!sel || sel.kind !== "region" || $("place").hidden) return;
+  const f = by != null && fc.features.find(x => x.properties.NAME === sel.name);
+  if (!f) { $("place").hidden = true; state.selected = null; return; }
+  $("pYear").textContent = `${fmtYear(by).n} ${fmtYear(by).s}`.trim() + " · " + (PRECISION[f.properties.BORDERPRECISION] || "approximate");
 }
 function updateSourceLine() {
   const y = state.year, by = state.borderYear;
@@ -442,7 +456,11 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
 }));
 
 /* ---------- Journeys ---------- */
-function startTour(i) { stopPlay(); state.tour = TOURS[i]; state.tourStep = 0; $("caption").hidden = false; showStep(); }
+function startTour(i) {
+  stopPlay(); state.tour = TOURS[i]; state.tourStep = 0; $("caption").hidden = false;
+  if (innerWidth < 760) $("drawer").classList.add("closed");   // on a phone the caption would sit on the panel
+  showStep();
+}
 function showStep() {
   const t = state.tour, s = t.steps[state.tourStep];
   // Remember the journey, so a reload (or the Mac app refreshing after an update) carries on from this stop
@@ -597,7 +615,8 @@ $("closePlace").addEventListener("click", () => $("place").hidden = true);
 
 /* ---------- History: what happened, year by year and day by day ---------- */
 const WIKI = "https://en.wikipedia.org";
-const wikiApi = params => fetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" })).then(r => r.json());
+const wikiApi = params => fetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" }))
+  .then(r => { if (!r.ok) throw new Error("Wikipedia answered " + r.status); return r.json(); });
 const ordinal = n => { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
 const wikiUrl = t => WIKI + "/wiki/" + encodeURIComponent(t.replace(/ /g, "_"));
 const MONTH = "January|February|March|April|May|June|July|August|September|October|November|December";
@@ -803,9 +822,9 @@ async function showHistory(y) {
   if (y >= TODAY) { el.querySelector(".ctx").textContent = "Drag the timeline back to see what happened at any moment, from the Big Bang to yesterday."; renderMilestoneList(el, nearbyMilestones(y)); panelHooks.forEach(h => h(el)); return; }
   const titles = historyTitles(y);
   if (!titles.length) { await showDeepHistory(y, id); return; }
-  let data = null;
-  for (const t of titles) { data = await loadHistory(t).catch(() => null); if (id !== histReq) return; if (data && data.events.length) break; }
-  if (!data || !data.events.length) { await showDeepHistory(y, id); return; }
+  let data = null, failed = false;
+  for (const t of titles) { data = await loadHistory(t).catch(() => { failed = true; return null; }); if (id !== histReq) return; if (data && data.events.length) break; }
+  if (!data || !data.events.length) { await showDeepHistory(y, id, failed); return; }
   data.year = y;
   data.exact = data.title === String(y) || data.title === `AD ${y}` || data.title === `${-y} BC`;
   if (data.exact && !data.boosted) {
@@ -1044,12 +1063,18 @@ async function pinMilestones(list) {
   if (state.deepMilestones !== list) return;
   setPins(withAt.map((ms, j) => ({ type: "Feature", id: 1000 + MILESTONES.indexOf(ms), properties: { ms: MILESTONES.indexOf(ms), imp: ms.k / 3, text: ms.t }, geometry: { type: "Point", coordinates: pts[j] } })));
 }
-async function showDeepHistory(y, id) {
+async function showDeepHistory(y, id, failed = false) {
   const el = $("tab-history");
   const art = ageArticle(y) || historyTitles(y)[0];
-  const sum = art ? await summary(art).catch(() => null) : null;
+  const sum = art ? await summary(art).catch(() => { failed = true; return null; }) : null;
   if (id !== histReq) return;
-  el.querySelector(".ctx").textContent = sum ? sum.extract : "No event list exists for this moment.";
+  el.querySelector(".ctx").textContent = sum ? sum.extract : failed ? "Couldn't reach Wikipedia just now." : "No event list exists for this moment.";
+  if (!sum && failed) {
+    const retry = document.createElement("button");
+    retry.type = "button"; retry.className = "retry"; retry.textContent = "Try again";
+    retry.addEventListener("click", () => { lastHistKey = ""; showHistory(state.year); });
+    el.querySelector(".hist-head").appendChild(retry);
+  }
   if (sum) el.querySelector(".hist-head").insertAdjacentHTML("beforeend", `<a href="${wikiUrl(sum.title)}" target="_blank" rel="noopener">Read “${sum.title}” on Wikipedia ↗</a>`);
   const list = nearbyMilestones(y);
   renderMilestoneList(el, list);
@@ -1087,7 +1112,8 @@ const sumCache = new Map();
 async function summary(title, search = false) {
   const key = title + (search ? "?s" : "");
   if (sumCache.has(key)) return sumCache.get(key);
-  const get = t => fetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_"))).then(r => r.ok ? r.json() : null);
+  // a missing article is an answer (null); a refused or failed request is an error, so it isn't cached and can be retried
+  const get = t => fetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_"))).then(r => r.ok ? r.json() : r.status === 404 ? null : Promise.reject(new Error("Wikipedia answered " + r.status)));
   let s = await get(title);
   if ((!s || s.type === "disambiguation") && search) {
     // Accept a search result only if its title covers nearly every meaningful word of the name
@@ -1160,6 +1186,7 @@ function savedView() { try { return JSON.parse(localStorage.getItem("palimpsest:
 
 /* ---------- Drawer & keys ---------- */
 $("closeDrawer").addEventListener("click", () => $("drawer").classList.add("closed"));
+if (innerWidth < 760) $("drawer").classList.add("closed");   // on a phone the panel would cover the globe and the year
 $("openDrawer").addEventListener("click", () => $("drawer").classList.remove("closed"));
 document.addEventListener("keydown", e => {
   if (e.target.matches("input:not([type=range]), textarea, select")) return;
