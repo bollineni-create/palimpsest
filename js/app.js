@@ -1195,6 +1195,12 @@ function savedView() { try { return JSON.parse(localStorage.getItem("palimpsest:
 /* ---------- Drawer & keys ---------- */
 $("closeDrawer").addEventListener("click", () => $("drawer").classList.add("closed"));
 if (innerWidth < 760) $("drawer").classList.add("closed");   // on a phone the panel would cover the globe and the year
+let wasWide = innerWidth >= 760;
+addEventListener("resize", () => {   // folding a foldable (iPhone Duo) turns a tablet-sized screen into a phone mid-session: give the globe back the same way
+  const wide = innerWidth >= 760;
+  if (wasWide && !wide) { $("drawer").classList.add("closed"); setTimelineMore(false); }
+  wasWide = wide;
+});
 $("openDrawer").addEventListener("click", () => $("drawer").classList.remove("closed"));
 document.addEventListener("keydown", e => {
   if (e.target.matches("input:not([type=range]), textarea, select")) return;
