@@ -549,6 +549,31 @@ function setTimelineMore(on) {
   requestAnimationFrame(() => { layoutTicks(); placeOverlays(); if (on && typeof updateFine === "function") updateFine(); });
 }
 $("tlMore").addEventListener("click", () => setTimelineMore(!document.querySelector(".timeline").classList.contains("expanded")));
+// Hide the timeline to see the whole globe; a pill at the bottom (or H) brings it back. Remembered between visits.
+const TL_HIDDEN_KEY = "palimpsest:timeline-hidden";
+function setTimelineHidden(on, { save = true } = {}) {
+  const tl = document.querySelector(".timeline");
+  if (tl.classList.contains("tucked") === on) return;
+  const hadFocus = tl.contains(document.activeElement) || document.activeElement === $("tlShow");
+  tl.classList.toggle("tucked", on);
+  tl.toggleAttribute("inert", on);
+  $("tlShow").hidden = !on;
+  if (save) try { localStorage.setItem(TL_HIDDEN_KEY, on ? "1" : ""); } catch {}
+  if (hadFocus) (on ? $("tlShow") : $("tlHide")).focus({ preventScroll: true });
+  requestAnimationFrame(placeOverlays);
+}
+$("tlHide").addEventListener("click", () => setTimelineHidden(true));
+$("tlShow").addEventListener("click", () => setTimelineHidden(false));
+yearHooks.push(y => { $("tlShowYr").textContent = fmtLabel(y); });
+// Swipe the timeline's empty edges down to hide it, and the pill up to bring it back
+(() => {
+  let sy = null;
+  const tl = document.querySelector(".timeline");
+  tl.addEventListener("pointerdown", e => { sy = e.target === tl || e.target.matches(".tl-row, .tl-controls, .ticks") ? e.clientY : null; });
+  tl.addEventListener("pointerup", e => { if (sy !== null && e.clientY - sy > 40) setTimelineHidden(true); sy = null; });
+  $("tlShow").addEventListener("pointerdown", e => { sy = e.clientY; });
+  $("tlShow").addEventListener("pointermove", e => { if (sy !== null && sy - e.clientY > 24) { sy = null; setTimelineHidden(false); } });
+})();
 $("todayBtn").addEventListener("click", () => { stopPlay(); setYear(TODAY, { exact: true }); });
 function toggleTilt() {
   const tilted = map.getPitch() > 10;
@@ -1214,6 +1239,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "[" || e.key === "]") { e.preventDefault(); stepDay(e.key === "]" ? 1 : -1); }
   if (e.key === "Escape") $("drawer").classList.toggle("closed");
   if (e.key === "t" || e.key === "T") toggleTilt();
+  if (e.key === "h" || e.key === "H") setTimelineHidden(!document.querySelector(".timeline").classList.contains("tucked"));
 });
 
 /* ---------- Boot ---------- */
@@ -1252,7 +1278,8 @@ if (linked) {
 } else setYear(1900);
 map.on("load", () => { state.ready = true; setYear(state.year, { exact: true }); updateTerrain(); resumeTour(); });
 function placeOverlays() {
-  const h = document.querySelector(".timeline").offsetHeight + 28;
+  const tl = document.querySelector(".timeline");
+  const h = (tl.classList.contains("tucked") ? $("tlShow").offsetHeight : tl.offsetHeight) + 28;
   $("caption").style.bottom = h + "px";
   const place = $("place");
   if (innerWidth >= 760) place.style.maxHeight = `${innerHeight - h - 28}px`; else place.style.maxHeight = "";   // card sits 14px from the top and stops 14px above the timeline
@@ -1265,4 +1292,5 @@ addEventListener("resize", placeOverlays);
 map.on("load", placeOverlays);
 // keep the credits folded into the ⓘ button until asked for
 map.on("load", () => document.querySelectorAll(".maplibregl-ctrl-attrib").forEach(el => el.classList.remove("maplibregl-compact-show")));
+try { if (localStorage.getItem(TL_HIDDEN_KEY) === "1") setTimelineHidden(true, { save: false }); } catch {}
 placeOverlays();

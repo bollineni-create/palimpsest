@@ -131,3 +131,125 @@ $("fineAuto").addEventListener("click", () => { fineSpan = null; updateFine(); }
 yearHooks.push((y, opts) => { if (!fineDragging && !opts.fromFine) updateFine(); });
 addEventListener("resize", () => { if (!fineDragging) updateFine(); });
 updateFine();
+
+/* ---------- Hold the playhead to scrub ---------- */
+// A quick drag on the playhead moves it along the whole timeline, as before. Hold it still for a moment
+// and the line zooms in: it becomes a ruler of just the span around the current moment (a century in
+// modern times, more in deep time) with the playhead under your finger, and sliding your finger up,
+// away from the line, zooms in further, down to a decade, so you can land on an exact year. Resting the
+// finger near either end of the line pans the ruler that way.
+const HOLD_MS = 280, FINE_STEP_PX = 44;
+let scrub = null;
+const placeGrip = () => { $("grip").style.left = $("head").style.left; };
+yearHooks.push(placeGrip);
+placeGrip();
+function scrubSpan() {
+  const base = FINE_SPANS.indexOf(FINE_SPANS.find(v => v >= autoSpan(scrub.startYear)));
+  const finer = Math.max(0, Math.floor((scrub.startY - scrub.y) / FINE_STEP_PX));
+  return FINE_SPANS[Math.max(0, base - finer)];
+}
+function showScrubTip() {
+  const sp = scrubSpan(), tip = $("scrubTip"), r = $("time").getBoundingClientRect();
+  $("scrubYr").textContent = fmtLabel(state.year);
+  $("scrubSpan").textContent = `${spanLabel(sp)} across` + (sp > FINE_SPANS[0] ? " · slide up for finer" : "");
+  // keep the bubble on screen near the ends of the line
+  const x = scrubX(r.width), half = tip.offsetWidth / 2;
+  tip.style.left = Math.max(8 + half - r.left, Math.min(innerWidth - 8 - half - r.left, x)) + "px";
+}
+// The zoomed ruler: [lo, lo + span] across the track, placed so the year under the finger is `year`
+function anchorZoom(year, clientX) {
+  const r = $("time").getBoundingClientRect(), sp = scrubSpan();
+  scrub.span = sp;
+  scrub.lo = year - Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * sp;
+  drawZoom();
+}
+function drawZoom() {
+  const { lo, span: sp } = scrub, hi = lo + sp, el = $("zrTicks");
+  const fit = Math.max(2, Math.min(7, Math.floor((el.clientWidth || 300) / 70)));
+  const step = niceStep(sp / fit), minor = step / (String(step)[0] === "2" ? 4 : 5);
+  const pct = t => ((t - lo) / sp * 100) + "%";
+  el.innerHTML = "";
+  for (let t = Math.ceil(lo / minor) * minor; t <= hi; t += minor) {
+    if (t > TODAY || t < BIG_BANG) continue;
+    const major = Math.abs(t / step - Math.round(t / step)) < 1e-6;
+    const i = document.createElement("i");
+    if (major) i.className = "major";
+    i.style.left = pct(t);
+    el.appendChild(i);
+    if (major && (t - lo) / sp > .04 && (t - lo) / sp < .96) { const s = document.createElement("span"); s.style.left = pct(t); s.textContent = shortLabel(t === 0 ? 1 : t); el.appendChild(s); }
+  }
+}
+// x of the current year on the track, in px: on the zoomed ruler while scrubbing, else on the whole line
+function scrubX(w) { return scrub && scrub.mode === "fine" ? (state.year - scrub.lo) / scrub.span * w : yearToPos(state.year) * w; }
+function placeZoomHead() { $("zrHead").style.left = (4 + scrubX($("time").getBoundingClientRect().width) - 1.5) + "px"; }
+function startFineScrub() {
+  if (!scrub) return;
+  scrub.mode = "fine";
+  anchorZoom(state.year, scrub.x);
+  document.querySelector(".timeline").classList.add("scrubbing");
+  placeZoomHead();
+  requestAnimationFrame(panLoop);
+  if (navigator.vibrate) navigator.vibrate(8);
+  showScrubTip();
+}
+$("grip").addEventListener("pointerdown", e => {
+  if (e.button > 0) return;
+  e.preventDefault();
+  stopPlay();
+  $("grip").setPointerCapture(e.pointerId);
+  scrub = { id: e.pointerId, mode: "hold", x0: e.clientX, x: e.clientX, startY: e.clientY, y: e.clientY, startYear: state.year };
+  scrub.timer = setTimeout(startFineScrub, HOLD_MS);
+});
+$("grip").addEventListener("pointermove", e => {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  const r = $("time").getBoundingClientRect();
+  if (scrub.mode === "hold") {
+    if (Math.hypot(e.clientX - scrub.x0, e.clientY - scrub.startY) < 6) return;
+    clearTimeout(scrub.timer);
+    scrub.mode = "drag";
+  }
+  if (scrub.mode === "drag") {
+    setYear(posToYear(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))));
+  } else {
+    scrub.y = e.clientY;
+    scrub.x = e.clientX;
+    scrub.moved = true;
+    scrubTo();
+  }
+  scrub.x = e.clientX;
+});
+// Fine scrubbing: the year under the finger on the zoomed ruler
+function scrubTo() {
+  const r = $("time").getBoundingClientRect(), f = Math.max(0, Math.min(1, (scrub.x - r.left) / r.width));
+  // sliding up zooms in further, around the year under the finger
+  if (scrubSpan() !== scrub.span) anchorZoom(scrub.lo + f * scrub.span, scrub.x);
+  const y = Math.max(BIG_BANG, Math.min(TODAY, scrub.lo + f * scrub.span));
+  setYear(y, { exact: scrub.span <= 1e5 });
+  placeZoomHead();
+  showScrubTip();
+}
+// Near either end of the line, pan the ruler: faster the closer the finger is to the end
+const EDGE_PX = 32;
+function panLoop(now) {
+  if (!scrub || scrub.mode !== "fine") return;
+  const r = $("time").getBoundingClientRect(), dt = Math.min(50, now - (scrub.t || now)) / 1000;
+  scrub.t = now;
+  const push = scrub.x < r.left + EDGE_PX ? -(r.left + EDGE_PX - scrub.x) : scrub.x > r.right - EDGE_PX ? scrub.x - (r.right - EDGE_PX) : 0;
+  if (push && dt && scrub.moved) {
+    const lo = scrub.lo + Math.sign(push) * Math.min(1, Math.abs(push) / EDGE_PX) * scrub.span * .8 * dt;
+    scrub.lo = Math.max(BIG_BANG - scrub.span / 2, Math.min(TODAY - scrub.span / 2, lo));
+    drawZoom();
+    scrubTo();
+  }
+  requestAnimationFrame(panLoop);
+}
+function endScrub(e) {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  clearTimeout(scrub.timer);
+  scrub = null;
+  document.querySelector(".timeline").classList.remove("scrubbing");
+  updateFine();
+}
+$("grip").addEventListener("pointerup", endScrub);
+$("grip").addEventListener("pointercancel", endScrub);
+$("grip").addEventListener("contextmenu", e => e.preventDefault());
