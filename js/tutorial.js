@@ -5,7 +5,7 @@ const TUTORIAL_KEY = "palimpsest:tutorial-done";
 const TUTORIAL = [
   { title: "Welcome to Palimpsest", text: "A journey through 13.8 billion years on a 3D globe: borders, old maps, thinkers, art and what happened each day. This tour takes about a minute.", start: true },
   { target: ".search", title: "Search anything", text: "Type a year or date, a person, a place or an event. Palimpsest finds its moment and location, takes you there and shows what it was. Press / to search at any time." },
-  { target: ".track", title: "The timeline", text: "Drag along this line to travel through time: the Big Bang on the left, today on the right. It's coloured by the geologic time scale, and each dot is a landmark moment. Hover over a dot to see what it is, or click to jump there." },
+  { target: ".track", title: "The timeline", text: "Drag along this line to travel through time: the Big Bang on the left, today on the right. Hold the playhead for a moment to scrub precisely, and slide up for finer steps. It's coloured by the geologic time scale, and each dot is a landmark moment. Hover over a dot to see what it is, or click to jump there." },
   { target: "#yr", title: "Type any moment", text: "Click the year to type an exact moment: 1453, 323 BC, 66 million years ago, or a date like 20 July 1969." },
   { target: ".fine-row", title: "Fine-tune", text: "This ruler zooms in around the current moment. Use − and + to choose a span from 10 years to a billion, then drag to scrub precisely." },
   { target: "#play", title: "Watch it unfold", text: "Press play to run history forwards and watch borders change. The Speed slider sets how fast." },
@@ -16,7 +16,7 @@ const TUTORIAL = [
   { target: "#layerChips", title: "Thinkers and art", text: "Switch on layers for the philosophers alive at the time and for real artworks from the period, shown where they were made. Philosophy and Art, at the bottom of the panel, tell each story era by era." },
   { target: '.tabs button[data-tab="tours"]', title: "Guided journeys", text: "Seventeen journeys fly you through big stories, from the Big Bang to you, the Silk Road and the Second World War. Old maps lists the historical maps on the globe." },
   { target: "#askBtn", title: "Ask the guide", text: "Ask an AI guide about wherever you are. It knows the moment and what's on screen, and it can take you places. It starts on a free model with no key; Settings lets you switch to Claude, ChatGPT or other free models." },
-  { title: "You're ready", text: "Keys: ← → step years · [ ] step days · Space plays · T tilts · Esc hides the panel. Replay this tour any time from Tutorial at the bottom of the panel.", end: true },
+  { title: "You're ready", text: "Keys: ← → step years · [ ] step days · Space plays · T tilts · H hides the timeline · Esc hides the panel. Replay this tour any time from Tutorial at the bottom of the panel.", end: true },
 ];
 let tutStep = -1;
 
@@ -27,6 +27,7 @@ function startTutorial() {
   $("drawer").classList.remove("closed");
   $("place").hidden = true;
   const guide = document.getElementById("guide"); if (guide) guide.hidden = true;
+  setTimelineHidden(false, { save: false });
   setTimelineMore(true);   // the tour points at the fine-tune ruler
   tutStep = 0;
   $("tutorial").hidden = false;

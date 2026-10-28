@@ -131,3 +131,72 @@ $("fineAuto").addEventListener("click", () => { fineSpan = null; updateFine(); }
 yearHooks.push((y, opts) => { if (!fineDragging && !opts.fromFine) updateFine(); });
 addEventListener("resize", () => { if (!fineDragging) updateFine(); });
 updateFine();
+
+/* ---------- Hold the playhead to scrub ---------- */
+// A quick drag on the playhead moves it along the whole timeline, as before. Hold it still for a moment
+// and it switches to fine scrubbing: the width of the timeline now covers only the span around the
+// current moment (a century in modern times, more in deep time), and sliding your finger up, away from
+// the line, narrows it further, down to a decade, so you can land on an exact year.
+const HOLD_MS = 280, FINE_STEP_PX = 44;
+let scrub = null;
+const placeGrip = () => { $("grip").style.left = $("head").style.left; };
+yearHooks.push(placeGrip);
+placeGrip();
+function scrubSpan() {
+  const base = FINE_SPANS.indexOf(FINE_SPANS.find(v => v >= autoSpan(scrub.startYear)));
+  const finer = Math.max(0, Math.floor((scrub.startY - scrub.y) / FINE_STEP_PX));
+  return FINE_SPANS[Math.max(0, base - finer)];
+}
+function showScrubTip() {
+  const sp = scrubSpan(), tip = $("scrubTip"), r = $("time").getBoundingClientRect();
+  $("scrubYr").textContent = fmtLabel(state.year);
+  $("scrubSpan").textContent = `${spanLabel(sp)} across` + (sp > FINE_SPANS[0] ? " · slide up for finer" : "");
+  // keep the bubble on screen near the ends of the line
+  const x = yearToPos(state.year) * r.width, half = tip.offsetWidth / 2;
+  tip.style.left = Math.max(8 + half - r.left, Math.min(innerWidth - 8 - half - r.left, x)) + "px";
+}
+function startFineScrub() {
+  if (!scrub) return;
+  scrub.mode = "fine";
+  scrub.fineYear = state.year;
+  document.querySelector(".timeline").classList.add("scrubbing");
+  if (navigator.vibrate) navigator.vibrate(8);
+  showScrubTip();
+}
+$("grip").addEventListener("pointerdown", e => {
+  if (e.button > 0) return;
+  e.preventDefault();
+  stopPlay();
+  $("grip").setPointerCapture(e.pointerId);
+  scrub = { id: e.pointerId, mode: "hold", x0: e.clientX, x: e.clientX, startY: e.clientY, y: e.clientY, startYear: state.year };
+  scrub.timer = setTimeout(startFineScrub, HOLD_MS);
+});
+$("grip").addEventListener("pointermove", e => {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  const r = $("time").getBoundingClientRect();
+  if (scrub.mode === "hold") {
+    if (Math.hypot(e.clientX - scrub.x0, e.clientY - scrub.startY) < 6) return;
+    clearTimeout(scrub.timer);
+    scrub.mode = "drag";
+  }
+  if (scrub.mode === "drag") {
+    setYear(posToYear(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))));
+  } else {
+    scrub.y = e.clientY;
+    const sp = scrubSpan();
+    scrub.fineYear = Math.max(BIG_BANG, Math.min(TODAY, scrub.fineYear + (e.clientX - scrub.x) / r.width * sp));
+    setYear(scrub.fineYear, { exact: sp <= 1e5 });
+    showScrubTip();
+  }
+  scrub.x = e.clientX;
+});
+function endScrub(e) {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  clearTimeout(scrub.timer);
+  scrub = null;
+  document.querySelector(".timeline").classList.remove("scrubbing");
+  updateFine();
+}
+$("grip").addEventListener("pointerup", endScrub);
+$("grip").addEventListener("pointercancel", endScrub);
+$("grip").addEventListener("contextmenu", e => e.preventDefault());
