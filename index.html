@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.css">
-<link rel="stylesheet" href="css/app.css?v=202610280851">
+<link rel="stylesheet" href="css/app.css?v=202610280855">
 <script>try { const t = localStorage.getItem("palimpsest:theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 
 </head>
@@ -146,6 +146,7 @@
       <div class="bands" id="bands" aria-hidden="true"></div>
       <input id="time" type="range" min="0" max="10000" value="0" aria-label="Year">
       <div class="head" id="head"></div>
+      <div class="zoom-ruler" id="zoomRuler" aria-hidden="true"><div class="zr-ticks" id="zrTicks"></div><div class="zr-head" id="zrHead"></div></div>
       <div class="grip" id="grip" aria-hidden="true"></div>
       <div class="scrub-tip" id="scrubTip" aria-hidden="true"><b id="scrubYr"></b><span id="scrubSpan"></span></div>
       <div class="marks" id="marks" aria-label="Landmarks"></div>
@@ -181,16 +182,16 @@
 <button class="glass tl-show" id="tlShow" hidden title="Show the timeline (H)" aria-label="Show the timeline">▴ <span id="tlShowYr"></span><span class="tag">Timeline</span></button>
 
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.8.0/dist/maplibre-gl.js"></script>
-<script src="js/core.js?v=202610280851"></script>
-<script src="js/data/milestones.js?v=202610280851"></script>
-<script src="js/data/maps.js?v=202610280851"></script>
-<script src="js/data/tours.js?v=202610280851"></script>
-<script src="js/data/thinkers.js?v=202610280851"></script>
-<script src="js/app.js?v=202610280851"></script>
-<script src="js/layers.js?v=202610280851"></script>
-<script src="js/finetune.js?v=202610280851"></script>
-<script src="js/guide.js?v=202610280851"></script>
-<script src="js/search.js?v=202610280851"></script>
-<script src="js/tutorial.js?v=202610280851"></script>
+<script src="js/core.js?v=202610280855"></script>
+<script src="js/data/milestones.js?v=202610280855"></script>
+<script src="js/data/maps.js?v=202610280855"></script>
+<script src="js/data/tours.js?v=202610280855"></script>
+<script src="js/data/thinkers.js?v=202610280855"></script>
+<script src="js/app.js?v=202610280855"></script>
+<script src="js/layers.js?v=202610280855"></script>
+<script src="js/finetune.js?v=202610280855"></script>
+<script src="js/guide.js?v=202610280855"></script>
+<script src="js/search.js?v=202610280855"></script>
+<script src="js/tutorial.js?v=202610280855"></script>
 </body>
 </html>
