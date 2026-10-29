@@ -1291,6 +1291,18 @@ function placeOverlays() {
 addEventListener("resize", placeOverlays);
 map.on("load", placeOverlays);
 // keep the credits folded into the ⓘ button until asked for
-map.on("load", () => document.querySelectorAll(".maplibregl-ctrl-attrib").forEach(el => el.classList.remove("maplibregl-compact-show")));
+// Keep the compact credits folded to their (i) button: MapLibre opens them again when the map resizes
+// (rotating or unfolding a phone), where they'd sit over the scale and the timeline.
+const foldCredits = () => document.querySelectorAll(".maplibregl-ctrl-attrib").forEach(el => el.classList.remove("maplibregl-compact-show"));
+map.on("load", foldCredits);
+map.on("resize", () => setTimeout(foldCredits));
+// Fade the bottom of the panel while there's more to scroll to.
+document.querySelectorAll(".drawer .scroll").forEach(el => {
+  const edge = () => el.classList.toggle("more-below", el.scrollTop + el.clientHeight < el.scrollHeight - 4);
+  el.addEventListener("scroll", edge, { passive: true });
+  if ("ResizeObserver" in window) new ResizeObserver(edge).observe(el);
+  new MutationObserver(() => requestAnimationFrame(edge)).observe(el, { childList: true, subtree: true });
+  edge();
+});
 try { if (localStorage.getItem(TL_HIDDEN_KEY) === "1") setTimelineHidden(true, { save: false }); } catch {}
 placeOverlays();

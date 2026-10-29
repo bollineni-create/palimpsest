@@ -64,7 +64,10 @@ button, input { font: inherit; color: inherit; }
 .tag { font: 500 10px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
 
 /* ---------- Year readout ---------- */
-.readout { position: fixed; z-index: 5; top: calc(6px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; text-shadow: var(--readout-shadow); padding: 10px 48px 14px; background: var(--readout-bg); }
+/* width: max-content, so the centred readout isn't squeezed to the half of the screen right of
+   left: 50% (that wrapped "The industrial age" onto two lines on narrow screens). */
+.readout { position: fixed; z-index: 5; top: calc(6px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; text-shadow: var(--readout-shadow); padding: 10px 48px 14px; background: var(--readout-bg);
+  width: max-content; max-width: calc(100vw - 150px); box-sizing: border-box; }
 .readout .yr { font-family: var(--f-year); }
 .readout .period { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; padding: 4px 10px 4px 4px; border-radius: 999px; background: var(--panel-solid); color: var(--ink); font: 600 12px/1 var(--f-ui); text-shadow: none; }
 .readout .period i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
@@ -85,6 +88,8 @@ button, input { font: inherit; color: inherit; }
 .tabs button { flex: 1; padding: 6px 0; border: 1px solid var(--line); background: none; border-radius: 4px; cursor: pointer; font-weight: 500; color: var(--ink-soft); }
 .tabs button[aria-selected="true"] { background: var(--ink); color: var(--panel-solid); border-color: var(--ink); }
 .scroll { flex: 1; overflow-y: auto; padding: 6px 0 10px; }
+/* When the panel has more below the fold, fade its last line so it reads as "scroll", not cut off. */
+.scroll.more-below { -webkit-mask-image: linear-gradient(#000 calc(100% - 36px), transparent); mask-image: linear-gradient(#000 calc(100% - 36px), transparent); }
 .scroll h2 { margin: 0; padding: 12px 16px 6px; font: 500 10px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
 .card { display: grid; grid-template-columns: 58px 1fr; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 8px 16px; border: 0; background: none; cursor: pointer; border-left: 3px solid transparent; }
 .card:hover { background: var(--hover); }
@@ -100,6 +105,9 @@ button, input { font: inherit; color: inherit; }
 .foot a:hover { text-decoration: underline; }
 .open-drawer { position: fixed; z-index: 6; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; padding: 8px 12px; cursor: pointer; font-weight: 500; }
 .drawer:not(.closed) ~ .open-drawer { display: none; }
+/* Phone-width screens (a phone, the folded iPhone Duo beside Safari's side rail): the year sits
+   centred at the top, and the full label would run into it. Keep just the menu icon. */
+@media (max-width: 560px) { .open-drawer { padding: 7px 13px; font-size: 18px; line-height: 1.2; } .open-drawer .od-label { display: none; } }
 
 /* ---------- Place card ---------- */
 .place { position: fixed; z-index: 6; top: calc(14px + env(safe-area-inset-top, 0px)); right: 64px; width: min(340px, calc(100vw - 92px)); padding: 12px 14px 12px; overflow-y: auto; overscroll-behavior: contain; }
@@ -247,6 +255,7 @@ button, input { font: inherit; color: inherit; }
 @media (max-width: 760px) {
   .drawer { bottom: auto; max-height: 45vh; }
   .readout .yr { font-size: 38px; }
+  .readout { padding: 8px 16px 12px; }
   .place { top: auto; bottom: 200px; right: 14px; width: calc(100vw - 28px); }
   .tl-controls { margin-left: 0; }
   .timeline { left: 8px; right: 8px; padding: 8px 10px 10px; gap: 6px; }
