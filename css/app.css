@@ -100,6 +100,9 @@ button, input { font: inherit; color: inherit; }
 .foot a:hover { text-decoration: underline; }
 .open-drawer { position: fixed; z-index: 6; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; padding: 8px 12px; cursor: pointer; font-weight: 500; }
 .drawer:not(.closed) ~ .open-drawer { display: none; }
+/* Phone-width screens (a phone, the folded iPhone Duo beside Safari's side rail): the year sits
+   centred at the top, and the full label would run into it. Keep just the menu icon. */
+@media (max-width: 560px) { .open-drawer { padding: 7px 13px; font-size: 18px; line-height: 1.2; } .open-drawer .od-label { display: none; } }
 
 /* ---------- Place card ---------- */
 .place { position: fixed; z-index: 6; top: calc(14px + env(safe-area-inset-top, 0px)); right: 64px; width: min(340px, calc(100vw - 92px)); padding: 12px 14px 12px; overflow-y: auto; overscroll-behavior: contain; }
