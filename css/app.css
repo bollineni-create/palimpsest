@@ -239,9 +239,12 @@ button, input { font: inherit; color: inherit; }
 .track .bands span { color: var(--ink); border-left-color: var(--tick-soft); font-weight: 600; }
 
 /* ---------- Tour caption ---------- */
-.caption { position: fixed; z-index: 7; left: 50%; transform: translateX(-50%); bottom: 150px; max-width: min(560px, calc(100vw - 28px)); padding: 12px 16px; display: grid; gap: 6px; }
+/* width: max-content, because a box placed with left: 50% is otherwise fitted into the half of the screen
+   to its right; on a phone that squeezed the text into a narrow column and broke the buttons onto two lines. */
+.caption { position: fixed; z-index: 7; left: 50%; transform: translateX(-50%); bottom: 150px; width: max-content; max-width: min(560px, calc(100vw - 28px)); padding: 12px 16px; display: grid; gap: 6px; }
 .caption .step { font: 400 19px/1.25 var(--f-display); }
-.caption .row { display: flex; gap: 8px; justify-content: space-between; align-items: center; }
+.caption .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
+.caption .row .tag, .caption .row .pill { white-space: nowrap; }
 
 .hover-pop .maplibregl-popup-content { background: var(--panel-solid); color: var(--ink); font: 500 12.5px/1.2 var(--f-ui); padding: 6px 9px; border-radius: 4px; border: 1px solid var(--line); }
 .hover-pop .maplibregl-popup-tip { display: none; }
