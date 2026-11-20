@@ -452,7 +452,7 @@ function renderTours() {
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
-  ["history", "maps", "tours"].forEach(t => $("tab-" + t).hidden = b.dataset.tab !== t);
+  ["history", "maps", "tours", "saved"].forEach(t => $("tab-" + t).hidden = b.dataset.tab !== t);
 }));
 
 /* ---------- Journeys ---------- */

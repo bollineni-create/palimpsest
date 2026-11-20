@@ -99,6 +99,20 @@ button, input { font: inherit; color: inherit; }
 .card .t { display: block; font: 400 16px/1.15 var(--f-display); }
 .card .s { display: block; font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
 .empty { padding: 8px 16px; color: var(--ink-soft); font-size: 13px; }
+/* Saved moments and sync */
+.saved-bar { display: flex; gap: 8px; padding: 8px 16px 4px; flex-wrap: wrap; }
+.saved-bar .pill { min-height: 32px; }
+.moment { display: grid; grid-template-columns: 1fr auto; align-items: center; }
+.moment .card { padding-right: 4px; }
+.moment .rm { border: 0; background: none; color: var(--ink-soft); cursor: pointer; width: 40px; height: 40px; font-size: 18px; }
+.moment .rm:hover { color: var(--accent); }
+.sync-row { margin: 12px 16px 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; display: flex; gap: 10px; align-items: center; }
+.sync-row[hidden] { display: none; }
+.sync-row div { flex: 1; display: grid; gap: 2px; font-size: 13px; }
+.sync-row small { color: var(--ink-soft); font-size: 12px; }
+.resume { position: fixed; left: 50%; bottom: calc(118px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40; display: flex; gap: 10px; align-items: center; padding: 8px 8px 8px 14px; border-radius: 999px; font-size: 13px; max-width: calc(100vw - 24px); }
+.resume[hidden] { display: none; }
+.resume b { font-weight: 600; }
 .foot { border-top: 1px solid var(--line); padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
 .foot .tut-btn { margin-left: auto; }
 .foot a { color: var(--brass); font-size: 12.5px; text-decoration: none; }
