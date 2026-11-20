@@ -29,7 +29,7 @@ function thinkersOf(era) {
 const lifeSpan = t => t.b < 0 && t.d < 0 ? `${-t.b}–${-t.d} BC` : t.b < 0 ? `${-t.b} BC–AD ${t.d}` : `${t.b}–${t.d >= 2026 ? "" : t.d}`;
 
 /* ---------- Wikipedia ---------- */
-const wikiApi = params => fetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" })).then(r => r.json());
+const wikiApi = params => wikiFetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" })).then(r => r.json());
 // Lead pictures for a list of articles, in the order given, following redirects
 async function pictures(titles, size) {
   const r = await wikiApi({ action: "query", prop: "pageimages", piprop: "thumbnail", pithumbsize: size, titles: titles.slice(0, 50).join("|"), redirects: 1 }).catch(() => null);
@@ -48,7 +48,7 @@ async function pictures(titles, size) {
 }
 const sumCache = new Map();
 function summary(title) {
-  if (!sumCache.has(title)) sumCache.set(title, fetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(title.replace(/ /g, "_")))
+  if (!sumCache.has(title)) sumCache.set(title, wikiFetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(title.replace(/ /g, "_")))
     .then(r => r.ok ? r.json() : null).catch(() => null));
   return sumCache.get(title);
 }
@@ -263,7 +263,7 @@ const KEEP_TAGS = new Set(["P", "H2", "H3", "H4", "UL", "OL", "LI", "B", "STRONG
 const artCache = new Map();
 async function articleHtml(title) {
   if (artCache.has(title)) return artCache.get(title);
-  const r = await fetch(WIKI + "/api/rest_v1/page/html/" + encodeURIComponent(title.replace(/ /g, "_"))).catch(() => null);
+  const r = await wikiFetch(WIKI + "/api/rest_v1/page/html/" + encodeURIComponent(title.replace(/ /g, "_"))).catch(() => null);
   if (!r || !r.ok) return null;
   // Drop Wikipedia's <base> first: parsing it trips the site's CSP (base-uri 'self') and logs a violation.
   const doc = new DOMParser().parseFromString((await r.text()).replace(/<base\b[^>]*>/gi, ""), "text/html");

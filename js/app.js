@@ -648,7 +648,7 @@ $("closePlace").addEventListener("click", () => $("place").hidden = true);
 
 /* ---------- History: what happened, year by year and day by day ---------- */
 const WIKI = "https://en.wikipedia.org";
-const wikiApi = params => fetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" }))
+const wikiApi = params => wikiFetch(WIKI + "/w/api.php?" + new URLSearchParams({ ...params, format: "json", formatversion: 2, origin: "*" }))
   .then(r => { if (!r.ok) throw new Error("Wikipedia answered " + r.status); return r.json(); });
 const ordinal = n => { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
 const wikiUrl = t => WIKI + "/wiki/" + encodeURIComponent(t.replace(/ /g, "_"));
@@ -809,7 +809,7 @@ async function enrichEvents(events, year) {
   const idBatches = [];
   for (let i = 0; i < ids.length; i += 50) idBatches.push(ids.slice(i, i + 50));
   await Promise.all(idBatches.map(async batch => {
-    const r = await fetch("https://www.wikidata.org/w/api.php?" + new URLSearchParams({ action: "wbgetentities", ids: batch.join("|"), props: "sitelinks", format: "json", origin: "*" })).then(r => r.json()).catch(() => null);
+    const r = await wikiFetch("https://www.wikidata.org/w/api.php?" + new URLSearchParams({ action: "wbgetentities", ids: batch.join("|"), props: "sitelinks", format: "json", origin: "*" })).then(r => r.json()).catch(() => null);
     if (r && r.entities) Object.entries(r.entities).forEach(([id, ent]) => reach.set(id, Object.keys(ent.sitelinks || {}).length));
   }));
   let max = 1;
@@ -1146,7 +1146,7 @@ async function summary(title, search = false) {
   const key = title + (search ? "?s" : "");
   if (sumCache.has(key)) return sumCache.get(key);
   // a missing article is an answer (null); a refused or failed request is an error, so it isn't cached and can be retried
-  const get = t => fetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_"))).then(r => r.ok ? r.json() : r.status === 404 ? null : Promise.reject(new Error("Wikipedia answered " + r.status)));
+  const get = t => wikiFetch(WIKI + "/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_"))).then(r => r.ok ? r.json() : r.status === 404 ? null : Promise.reject(new Error("Wikipedia answered " + r.status)));
   let s = await get(title);
   if ((!s || s.type === "disambiguation") && search) {
     // Accept a search result only if its title covers nearly every meaningful word of the name
