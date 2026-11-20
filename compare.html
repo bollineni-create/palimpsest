@@ -160,6 +160,9 @@ button, input, select { font: inherit; color: inherit; }
 .cartouche h3 { font-weight: 800; letter-spacing: -.02em; }
 .drawer, .bar, .cartouche { border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) { .drawer { transition: none; } }
+  /* Tap targets (WCAG 2.5.8): at least 24 px to tap */
+  #closeDrawer { min-width: 24px; }
+  #opacity { min-height: 24px; }
 </style>
 </head>
 <body>

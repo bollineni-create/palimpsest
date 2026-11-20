@@ -453,3 +453,11 @@ button, input { font: inherit; color: inherit; }
 
 /* History: a lookup that failed can be retried */
 .hist-head .retry { justify-self: start; margin-top: 6px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 999px; padding: 5px 12px; font: 600 12.5px/1 var(--f-ui); cursor: pointer; }
+
+/* Tap targets (WCAG 2.5.8 asks for 24 × 24 px). These controls are drawn small on purpose, so an invisible
+   ::after, centred on each and exactly 24 px tall, takes the tap without moving anything on screen. */
+.theme-btn, .layer-chips .chip, .foot a, .foot .tut-btn { position: relative; }
+.theme-btn::after, .layer-chips .chip::after, .foot a::after, .foot .tut-btn::after {
+  content: ""; position: absolute; inset: calc(50% - 12px) 0;
+}
+#closeDrawer { min-width: 24px; }

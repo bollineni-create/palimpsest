@@ -54,7 +54,7 @@ function wdCoord(claims) {
   return c ? [c.mainsnak.datavalue.value.longitude, c.mainsnak.datavalue.value.latitude] : null;
 }
 async function wdClaims(qid) {
-  const r = await fetch("https://www.wikidata.org/w/api.php?" + new URLSearchParams({ action: "wbgetentities", ids: qid, props: "claims", format: "json", origin: "*" })).then(r => r.json()).catch(() => null);
+  const r = await wikiFetch("https://www.wikidata.org/w/api.php?" + new URLSearchParams({ action: "wbgetentities", ids: qid, props: "claims", format: "json", origin: "*" })).then(r => r.json()).catch(() => null);
   return (r && r.entities && r.entities[qid] && r.entities[qid].claims) || {};
 }
 async function openFromWikipedia(title, qid, description) {
