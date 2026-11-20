@@ -265,7 +265,8 @@ async function articleHtml(title) {
   if (artCache.has(title)) return artCache.get(title);
   const r = await fetch(WIKI + "/api/rest_v1/page/html/" + encodeURIComponent(title.replace(/ /g, "_"))).catch(() => null);
   if (!r || !r.ok) return null;
-  const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+  // Drop Wikipedia's <base> first: parsing it trips the site's CSP (base-uri 'self') and logs a violation.
+  const doc = new DOMParser().parseFromString((await r.text()).replace(/<base\b[^>]*>/gi, ""), "text/html");
   doc.querySelectorAll("style, script, link, meta, table, .mw-ref, sup.reference, .reference, .mw-references-wrap, .references, .navbox, .infobox, .metadata, .ambox, .hatnote, .shortdescription, .noprint, .mw-empty-elt, .gallery, .reflist, .sistersitebox, .side-box, .portalbox, .thumbcaption .magnify, audio, video, math, .mwe-math-element").forEach(n => n.remove());
   // Drop the reference sections, and the lead (already shown as the summary)
   doc.querySelectorAll("section").forEach(sec => {
