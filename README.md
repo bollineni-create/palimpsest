@@ -68,6 +68,12 @@ Then open <http://localhost:8000>. GitHub Pages works too: publish the repositor
 
 It needs Xcode's command line tools. The app reads its pages straight from the folder you built it in and reloads within a second whenever a file changes, which makes it a handy live preview while you work on the site. If the folder moves, it falls back to a copy bundled inside the app. The build is ad-hoc signed, so on another Mac you'll need to right-click and choose **Open** the first time.
 
+## Saved moments and sync
+
+The **Saved** tab keeps moments to come back to: a year and a view of the globe, saved with ☆ Save this moment and named however you like. They're kept in the browser.
+
+On [bollineni.co](https://bollineni.co/#palimpsest), sync keeps saved moments, the theme, layers, timeline, guide provider and journey progress the same on every linked device, with no account (turn it on at the bottom of the Saved tab; link a device by QR code, link or code). Where you were last is synced too, so opening Palimpsest on another device offers to continue there. Everything is encrypted in the browser first, and API keys never sync. `js/moments.js` holds both; off the site, the sync kit isn't there and only saved moments remain.
+
 ## How it's put together
 
 ```
