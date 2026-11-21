@@ -4,7 +4,7 @@
 :root {
   --space: #eeebe3; --panel: rgba(251,250,246,.94); --panel-solid: #fbfaf6;
   --ink: #22302a; --ink-soft: #6c776f; --line: rgba(34,48,42,.13);
-  --accent: #d4492a; --on-accent: #fff; --brass: #5f8f7d; --sage-ink: #3e6b5b;
+  --accent: #a86a00; --on-accent: #fff; --brass: #5f8f7d; --sage-ink: #3e6b5b;
   --hover: rgba(95,143,125,.1); --chip: rgba(34,48,42,.07); --shadow: rgba(34,48,42,.14);
   --f-display: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --f-note: "Cormorant Garamond", Georgia, serif;
@@ -20,7 +20,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --space: #121815; --panel: rgba(27,34,30,.92); --panel-solid: #1b221e; --ink: #e6ebe4; --ink-soft: #9ba79f; --line: rgba(230,235,228,.12);
-    --accent: #ef6c4b; --brass: #8fc2ab; --sage-ink: #9fd1b9; --hover: rgba(143,194,171,.12); --chip: rgba(230,235,228,.07); --shadow: rgba(0,0,0,.45);
+    --accent: #f0a93b; --on-accent: #1a1206; --brass: #8fc2ab; --sage-ink: #9fd1b9; --hover: rgba(143,194,171,.12); --chip: rgba(230,235,228,.07); --shadow: rgba(0,0,0,.45);
     --glass: linear-gradient(150deg, rgba(40,48,44,.52), rgba(16,20,18,.34) 45%, rgba(30,36,33,.46));
     --glass-inner: rgba(255,255,255,.07); --glass-inner-hover: rgba(255,255,255,.14);
     --glass-bar: rgba(18,24,21,.55); --glass-rim: rgba(255,255,255,.16);
@@ -31,7 +31,7 @@
 }
 :root[data-theme="dark"] {
   --space: #121815; --panel: rgba(27,34,30,.92); --panel-solid: #1b221e; --ink: #e6ebe4; --ink-soft: #9ba79f; --line: rgba(230,235,228,.12);
-  --accent: #ef6c4b; --brass: #8fc2ab; --sage-ink: #9fd1b9; --hover: rgba(143,194,171,.12); --chip: rgba(230,235,228,.07); --shadow: rgba(0,0,0,.45);
+  --accent: #f0a93b; --on-accent: #1a1206; --brass: #8fc2ab; --sage-ink: #9fd1b9; --hover: rgba(143,194,171,.12); --chip: rgba(230,235,228,.07); --shadow: rgba(0,0,0,.45);
   --glass: linear-gradient(150deg, rgba(40,48,44,.52), rgba(16,20,18,.34) 45%, rgba(30,36,33,.46));
   --glass-inner: rgba(255,255,255,.07); --glass-inner-hover: rgba(255,255,255,.14);
   --glass-bar: rgba(18,24,21,.55); --glass-rim: rgba(255,255,255,.16);

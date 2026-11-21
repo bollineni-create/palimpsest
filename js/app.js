@@ -277,7 +277,7 @@ const THEME_LIGHT = {
   lift: 0.36, sat: -0.3, bright: 1, contrast: -0.12, fill: 1.7, blur: 1.4,       // imagery softened like a watercolour wash
   palette: ["#9fc7b6", "#e6b77e", "#c98ea6", "#a7b8d8", "#d9c27a", "#b7a3cf", "#b9d39b", "#e9a890"],
   border: "#6b5a48", label: "#22302a", halo: "rgba(251,250,246,.85)",
-  pin: "#ffffff", stroke: "#22302a", old: "#d4492a",                                // event pins are drawn as transit stations
+  pin: "#ffffff", stroke: "#22302a", old: "#a86a00",                                // event pins are drawn as transit stations
   land: "#d8c79f", ocean: "#a9c9cf", sky: ["#eeebe3", "#d6e2df", "#e2e6e0"],
   thinker: "#5f8f7d", thinkerLabel: "#3e6b5b", tint: "paper",
 };
@@ -286,7 +286,7 @@ const THEME_DARK = {
   lift: 0.0, sat: -0.3, bright: 0.72, contrast: 0.08, fill: 1.45, blur: 1.4,
   palette: ["#4f8a76", "#b0864a", "#9c5f78", "#6579aa", "#a99447", "#7e6ba5", "#7a9c5c", "#b4705c"],
   border: "#d6c4a2", label: "#eef1ec", halo: "rgba(14,19,16,.88)",
-  pin: "#f2f4ef", stroke: "#121815", old: "#ef6c4b",
+  pin: "#f2f4ef", stroke: "#121815", old: "#f0a93b",
   land: "#8c7c57", ocean: "#11313d", sky: ["#0a1119", "#243a48", "#18252d"],
   thinker: "#8fc2ab", thinkerLabel: "#bfe3d1", tint: "night",
 };
